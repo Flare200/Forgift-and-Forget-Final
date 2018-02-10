@@ -9,9 +9,6 @@ Host Url:
 Port:
 	3306
 
-Password:
-	forgiftandforget
-
 Database Name:
 	forgiftandforget
 
@@ -34,9 +31,6 @@ Host Url:
 
 Port:
 	5432
-
-Password:
-	forgift2
 
 Database Name:
 	forgift2
