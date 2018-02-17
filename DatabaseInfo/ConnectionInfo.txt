@@ -1,5 +1,29 @@
 ---------------------------------------------------------------------------------------
-MySQL ForgiftAndForget Database Connection Info
+MySQL faf Database Connection Info
+---------------------------------------------------------------------------------------
+-MySQL has similiar syntax to the local Android Databases, in SqlLite, so use this one.
+---------------------------------------------------------------------------------------
+Host Url:
+	faf.chfppzvg2vo4.us-east-2.rds.amazonaws.com
+
+Port:
+	3306
+
+Database Name:
+	faf
+
+Master Username:
+	sa
+
+Master Password:
+	password123
+
+Connection String if you're using IntelliJ DataGrip:
+	jdbc:mysql://faf.chfppzvg2vo4.us-east-2.rds.amazonaws.com:3306/faf
+---------------------------------------------------------------------------------------
+
+---------------------------------------------------------------------------------------
+MySQL ForgiftAndForget Database Connection Info -- DELETED
 ---------------------------------------------------------------------------------------
 -MySQL has similiar syntax to the local Android Databases, in SqlLite, so use this one.
 ---------------------------------------------------------------------------------------
@@ -24,7 +48,7 @@ Connection String if you're using IntelliJ DataGrip:
 
 
 ---------------------------------------------------------------------------------------
-PostGres ForgiftAndForget Database Connection Info
+PostGres ForgiftAndForget Database Connection Info -- NOT IN USE
 ---------------------------------------------------------------------------------------
 Host Url:
 	forgift2.chfppzvg2vo4.us-east-2.rds.amazonaws.com
