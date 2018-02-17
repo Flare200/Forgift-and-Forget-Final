@@ -1,9 +1,12 @@
 package cs472.forgiftandforget;
 
-import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.method.KeyListener;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 
 public class MainActivity extends AppCompatActivity
@@ -18,14 +21,4 @@ public class MainActivity extends AppCompatActivity
         EditText passwordField = (EditText) findViewById(R.id.passwordField);
     }
 
-    public void onClick(View mainView)
-    {
-        EditText usernameField = (EditText) findViewById(R.id.usernameField);
-        EditText passwordField = (EditText) findViewById(R.id.passwordField);
-
-        if(passwordField.getText().toString().equals("password"))
-        {
-            startActivity(new Intent(MainActivity.this, friendList.class));
-        }
-    }
 }

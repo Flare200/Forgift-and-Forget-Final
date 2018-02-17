@@ -14,33 +14,4 @@
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
-
-
-
-    <string-array name="Testing_list">
-        <item>Fred</item>
-        <item>Grace</item>
-        <item>Bob</item>
-    </string-array>
-
-    <string-array name="Fred_list">
-        <item>Car</item>
-        <item>Books</item>
-    </string-array>
-
-    <string-array name="Grace_list">
-        <item>Borard Games</item>
-        <item>Cat Stuff</item>
-        <item>Shirt</item>
-    </string-array>
-
-    <string-array name="Bob_list">
-        <item>No ideas yet</item>
-    </string-array>
-
-    <string-array name="friendSpinnerOpt">
-        <item>Add Friend</item>
-        <item>Delete Friend</item>
-    </string-array>
-
 </resources>

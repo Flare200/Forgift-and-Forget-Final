@@ -6,24 +6,4 @@
     android:layout_height="match_parent"
     tools:context="cs472.forgiftandforget.friendList">
 
-
-    <LinearLayout
-        android:id="@+id/linearLayout"
-        android:layout_width="0dp"
-        android:layout_height="551dp"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintHorizontal_bias="0.333"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent">
-
-        <ExpandableListView
-            android:id="@+id/listView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-        </ExpandableListView>
-    </LinearLayout>
-
-
 </android.support.constraint.ConstraintLayout>
