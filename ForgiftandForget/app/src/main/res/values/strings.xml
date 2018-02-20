@@ -44,4 +44,9 @@
         <item>Delete Friend</item>
     </string-array>
 
+
+    <!-- Gift Idea Strings -->
+    <string name="giftIdeaName">Name</string>
+    <string name="giftIdeaNotes">Notes</string>
+    <string name="giftIdeaGallery">Pick From Gallery</string>
 </resources>

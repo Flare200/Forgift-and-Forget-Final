@@ -28,4 +28,10 @@ public class MainActivity extends AppCompatActivity
             startActivity(new Intent(MainActivity.this, friendList.class));
         }
     }
+
+    // BELOW IS FOR DEBUG ONLY DELETE WHEN DONE
+    public void sendMessage(View view) {
+        Intent intent = new Intent(this, GiftIdeas.class);
+        startActivity(intent);
+    }
 }
