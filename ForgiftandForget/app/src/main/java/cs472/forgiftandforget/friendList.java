@@ -2,12 +2,14 @@ package cs472.forgiftandforget;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Menu;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.ListView;
 import android.widget.SimpleExpandableListAdapter;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,6 +26,8 @@ public class friendList extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_friend_list);
 
+        //TextView testView = (TextView) findViewById(R.id.testText);
+        //testView.setText(getResources().getStringArray(R.array.Testing_list).toString());
         //Super Basic set up
         friendList = (ExpandableListView) findViewById(R.id.listView);
 
@@ -38,6 +42,8 @@ public class friendList extends AppCompatActivity
         List<String> subList01 = new ArrayList<String>();
         List<String> subList02 = new ArrayList<String>();
         List<String> subList03 = new ArrayList<String>();
+        List<String> subListEp = new ArrayList<String>();
+
 
 
         for(String title : friends)
@@ -56,21 +62,33 @@ public class friendList extends AppCompatActivity
         {
             subList03.add(title);
         }
+        headings.add("TEST");
+        subListEp.add("");
 
         ideaList.put(headings.get(0),subList01);
         ideaList.put(headings.get(1),subList02);
         ideaList.put(headings.get(2),subList03);
-
+        ideaList.put(headings.get(3),subListEp);
         friendsListAdapter myAdapter = new friendsListAdapter(this,headings,ideaList);
         friendList.setAdapter(myAdapter);
 
+        friendList.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
+            @Override
+            public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id)
+            {
+                //TextView testView = (TextView) findViewById(R.id.testText);
+                //testView.setText("CLICKED");
+                return false;
+            }
+        });
 
     }
 
-    private void test()
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu)
     {
-        //ExpandableListView listView = (ExpandableListView) findViewById(R.id.listView);
-        //listView.
+        getMenuInflater().inflate(R.menu.menu_resource,menu);
+        return true;
     }
 
 }
