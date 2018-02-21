@@ -15,14 +15,19 @@
         completions."
     </string>
 
-    <!-- Action Bar Strings-->
-
+    <!-- Friends List Action Bar Strings-->
+    <string name="add_friend">Add Friend</string>
 
     <string-array name="Testing_list">
         <item>Fred</item>
         <item>Grace</item>
         <item>Bob</item>
+        <item>Grace</item>
+        <item>Grace</item>
+        <item>Grace</item>
+        <item>Grace</item>
     </string-array>
+
 
     <string-array name="Fred_list">
         <item>Car</item>
