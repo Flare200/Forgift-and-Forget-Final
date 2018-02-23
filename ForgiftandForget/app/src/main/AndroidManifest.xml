@@ -25,7 +25,7 @@
         <activity android:name=".friendList" />
         <activity android:name=".ideaPage" />
         <activity android:name=".giftedList" />
-        <activity android:name=".GiftIdeas"></activity>
+        <activity android:name=".entireCreation"></activity>
     </application>
 
 </manifest>
