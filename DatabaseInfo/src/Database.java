@@ -5,11 +5,11 @@ import javax.sql.*;
 
 public class Database
 {
-	private static final String HOST_URL = "forgiftandforget.chfppzvg2vo4.us-east-2.rds.amazonaws.com";
+	private static final String HOST_URL = "faf.chfppzvg2vo4.us-east-2.rds.amazonaws.com";
 	private static final String PORT = "3306";
-	private static final String DB_INSTANCE_NAME = "forgiftandforget";
-	private static final String MASTER_USERNAME = "forgiftandforget";
-	private static final String MASTER_PASSWORD = "forgiftandforget";
+	private static final String DB_INSTANCE_NAME = "faf";
+	private static final String MASTER_USERNAME = "sa";
+	private static final String MASTER_PASSWORD = "password123";
 	private  static  final String CONN_STRING = String.format("jdbc:mysql://%s:%s/%s", HOST_URL, PORT, DB_INSTANCE_NAME);
 
 	private Connection conn = null;
@@ -36,7 +36,7 @@ public class Database
 			ResultSet resultSet = sqlStatement.executeQuery(cmd);
 			while (resultSet.next())
 			{
-				String tmpStr = resultSet.getString("charCol");
+				String tmpStr = resultSet.getString("passwordhash");
 				System.out.println(tmpStr);
 			}
 		}
