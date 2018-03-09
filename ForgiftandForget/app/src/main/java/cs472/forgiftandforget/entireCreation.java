@@ -25,13 +25,11 @@ public class entireCreation extends AppCompatActivity
     EditText emailField;
     EditText addressField;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_entire_creation);
-
         nameField  = (EditText) findViewById(R.id.nameField);
         dateField  = (EditText) findViewById(R.id.dateField);
         emailField  = (EditText) findViewById(R.id.emailField);

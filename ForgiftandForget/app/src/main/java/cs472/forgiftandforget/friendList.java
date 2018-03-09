@@ -1,11 +1,13 @@
 package cs472.forgiftandforget;
 
+import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.Toast;
 
@@ -28,6 +30,8 @@ import static android.icu.lang.UCharacter.GraphemeClusterBreak.T;
 
 public class friendList extends AppCompatActivity
 {
+    private Context ctx = this;
+
     ExpandableListView friendList;
     FirebaseAuth mAuth;
     database db;
@@ -35,6 +39,8 @@ public class friendList extends AppCompatActivity
     DatabaseReference ref;
     FirebaseUser currentUser;
 
+
+    static final int ADD_FRIEND_REQUEST = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -79,7 +85,7 @@ public class friendList extends AppCompatActivity
         List<String> headings = new ArrayList<String>();
 
 
-        friendsListAdapter myAdapter = new friendsListAdapter(this,headings,ideaList);
+        friendsListAdapter myAdapter = new friendsListAdapter(ctx,headings,ideaList);
         friendList.setAdapter(myAdapter);
 
         //Super Basic set up
@@ -176,7 +182,8 @@ public class friendList extends AppCompatActivity
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.action_add:
@@ -189,29 +196,48 @@ public class friendList extends AppCompatActivity
 
     private void addFriend()
     {
+        EditText test = (EditText) findViewById(R.id.testText);
+
+        String hold = null;
         friendList = (ExpandableListView) findViewById(R.id.listView);
+
         HashMap<String,List<String>> ideaList = new HashMap<String,List<String>>();
         List<String> headings = new ArrayList<String>();
-        List<String> newEntrie = new ArrayList<String>();
+        List<String> newEntire = new ArrayList<String>();
 
-        //Use this startActivityForResult();
-        startActivity(new Intent(friendList.this, entireCreation.class));
-
-
-
-        friendsListAdapter myAdapter = new friendsListAdapter(this,headings,ideaList);
+        friendsListAdapter myAdapter = new friendsListAdapter(ctx,headings,ideaList);
         friendList.setAdapter(myAdapter);
+
+        //Does not work yet please do not touch
+        Intent entireIntent = new Intent(ctx,entireCreation.class);
+        finish();
+        startActivityForResult(entireIntent,ADD_FRIEND_REQUEST);
+
     }
 
-    public void userLogOut(View view){
+    public void userLogOut(View view)
+    {
         FirebaseAuth.getInstance().signOut();
         finish();
-        Intent intent = new Intent(friendList.this, MainActivity.class);
+        Intent intent = new Intent(ctx, MainActivity.class);
         startActivity(intent);
     }
 
     public void addFriend(View view){
         Intent intent = new Intent(friendList.this, entireCreation.class);
         startActivity(intent);
+    }
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        // Check which request we're responding to
+        if (requestCode == ADD_FRIEND_REQUEST)
+        {
+            // Make sure the request was successful
+            if (resultCode == RESULT_OK)
+            {
+
+            }
+        }
     }
 }
