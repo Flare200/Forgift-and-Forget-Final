@@ -19,31 +19,19 @@
         android:id="@+id/giftPhoto"
         android:layout_width="142dp"
         android:layout_height="135dp"
+        android:layout_marginLeft="16dp"
         android:layout_marginStart="32dp"
         android:layout_marginTop="20dp"
+        app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/giftIdeaName"
         app:srcCompat="@android:drawable/screen_background_light_transparent" />
 
     <EditText
-        android:id="@+id/giftIdeaName"
-        android:layout_width="331dp"
-        android:layout_height="48dp"
-        android:layout_marginTop="16dp"
-        android:ems="10"
-        android:hint="@string/giftIdeaName"
-        android:inputType="textPersonName"
-        android:textSize="24sp"
-        app:layout_constraintHorizontal_bias="0.509"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <EditText
         android:id="@+id/giftIdeaNotes"
-        android:layout_width="330dp"
-        android:layout_height="131dp"
-        android:layout_marginTop="168dp"
+        android:layout_width="348dp"
+        android:layout_height="207dp"
+        android:layout_marginTop="172dp"
         android:ems="10"
         android:hint="@string/giftIdeaNotes"
         android:inputType="textMultiLine"
@@ -51,16 +39,17 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/giftIdeaName" />
 
-    <EditText
-        android:id="@+id/editText5"
-        android:layout_width="156dp"
-        android:layout_height="57dp"
-        android:layout_marginLeft="24dp"
-        android:layout_marginTop="24dp"
-        android:ems="10"
-        android:hint="Reminder Date"
-        android:inputType="date"
+    <TextView
+        android:id="@+id/giftIdeaName"
+        android:layout_width="319dp"
+        android:layout_height="45dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="48dp"
+        android:layout_marginTop="16dp"
+        android:text="@string/giftIdeaName"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/giftIdeaNotes" />
+        app:layout_constraintTop_toTopOf="parent" />
 
 </android.support.constraint.ConstraintLayout>
