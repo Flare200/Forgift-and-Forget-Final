@@ -1,5 +1,6 @@
 package cs472.forgiftandforget;
 
+import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -108,11 +109,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
-    protected void onStart() {
+    protected void onStart()
+    {
         super.onStart();
 
         // check if user is logged in already
-        if (mAuth.getCurrentUser() != null) {
+        if (mAuth.getCurrentUser() != null)
+        {
             finish();
             Intent intent = new Intent(MainActivity.this, friendList.class);
             startActivity(intent);
@@ -122,8 +125,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     // BELOW IS FOR DEBUG ONLY DELETE WHEN DONE
-    public void sendMessage(View view) {
-        Intent intent = new Intent(this, GiftIdeas.class);
+    public void sendMessage(View view)
+    {
+        Context ctx = this;
+        EditText input = (EditText) findViewById(R.id.emailField);
+        String mode = input.getText().toString();
+        Intent intent = null;
+        switch (mode)
+        {
+            case "giftIdeas":   intent = new Intent(ctx, GiftIdeas.class); break;
+            case "friend":  intent = new Intent(ctx, friendList.class); break;
+            default: intent = new Intent(ctx, friendList.class); break;
+        }
         startActivity(intent);
     }
 }
