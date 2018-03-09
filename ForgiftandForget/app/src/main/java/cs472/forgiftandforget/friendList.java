@@ -12,15 +12,19 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import com.google.firebase.auth.FirebaseAuth;
+
 public class friendList extends AppCompatActivity
 {
     ExpandableListView friendList;
+    FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_friend_list);
+        mAuth = FirebaseAuth.getInstance();
 
         friendList = (ExpandableListView) findViewById(R.id.listView);
         HashMap<String,List<String>> ideaList = new HashMap<String,List<String>>();
@@ -128,14 +132,14 @@ public class friendList extends AppCompatActivity
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.action_add:
-                addFrined();
+                addFriend();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
-    private void addFrined()
+    private void addFriend()
     {
         friendList = (ExpandableListView) findViewById(R.id.listView);
         HashMap<String,List<String>> ideaList = new HashMap<String,List<String>>();
@@ -149,5 +153,13 @@ public class friendList extends AppCompatActivity
 
         friendsListAdapter myAdapter = new friendsListAdapter(this,headings,ideaList);
         friendList.setAdapter(myAdapter);
+    }
+
+    public void userLogOut(View view){
+        FirebaseAuth.getInstance().signOut();
+        finish();
+        Intent intent = new Intent(friendList.this, MainActivity.class);
+        startActivity(intent);
+
     }
 }
