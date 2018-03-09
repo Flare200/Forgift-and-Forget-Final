@@ -7,24 +7,72 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ExpandableListView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import cs472.forgiftandforget.DatabaseClasses.database;
+import cs472.forgiftandforget.DatabaseClasses.friend;
+
+import static android.icu.lang.UCharacter.GraphemeClusterBreak.T;
 
 public class friendList extends AppCompatActivity
 {
     ExpandableListView friendList;
     FirebaseAuth mAuth;
+    database db;
+    List<friend> myList = new ArrayList<friend>();
+    DatabaseReference ref;
+    FirebaseUser currentUser;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_friend_list);
-        mAuth = FirebaseAuth.getInstance();
+
+        mAuth       = FirebaseAuth.getInstance();
+        currentUser = mAuth.getCurrentUser();
+        String uid  = currentUser.getUid();
+        ref         = FirebaseDatabase.getInstance().getReference("FriendsLists").child(uid);
+
+
+
+        // single event, on create, to populate a list of friends(myList)
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Iterable<DataSnapshot> children = dataSnapshot.getChildren();
+
+                for (DataSnapshot child: children) {
+                    friend newFriend = child.getValue(friend.class);
+                    myList.add(newFriend);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+
+
+
+
+
+
 
         friendList = (ExpandableListView) findViewById(R.id.listView);
         HashMap<String,List<String>> ideaList = new HashMap<String,List<String>>();
@@ -160,6 +208,10 @@ public class friendList extends AppCompatActivity
         finish();
         Intent intent = new Intent(friendList.this, MainActivity.class);
         startActivity(intent);
+    }
 
+    public void addFriend(View view){
+        Intent intent = new Intent(friendList.this, entireCreation.class);
+        startActivity(intent);
     }
 }
