@@ -48,7 +48,10 @@ captures/
 .externalNativeBuild
 
 # Google Services (e.g. APIs or Firebase)
-google-services.json
+# google-services.json
+# this is fine to check in, and is pointless not to for us. See:
+# https://stackoverflow.com/questions/37358340/should-i-add-the-google-services-json-from-firebase-to-my-repository
+# and https://groups.google.com/forum/#!msg/firebase-talk/bamCgTDajkw/uVEJXjtiBwAJ
 
 # Freeline
 freeline.py

@@ -1,0 +1,63 @@
+{
+  "project_info": {
+    "project_number": "1067439450635",
+    "firebase_url": "https://forgift-and-forget.firebaseio.com",
+    "project_id": "forgift-and-forget",
+    "storage_bucket": "forgift-and-forget.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1067439450635:android:546238b85b144a4b",
+        "android_client_info": {
+          "package_name": "cs472.forgiftandforget"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1067439450635-i8vgm2qeju1c8uira2b7akciig2qi7fs.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "cs472.forgiftandforget",
+            "certificate_hash": "a61b9d2833e3596ba196054074e1dd1fdf0c9a17"
+          }
+        },
+        {
+          "client_id": "1067439450635-s7dh37qlmf2oanlv278t4afs90pc4ks4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "cs472.forgiftandforget",
+            "certificate_hash": "232373169e7951f58472682c06f80168119feb72"
+          }
+        },
+        {
+          "client_id": "1067439450635-npe4ke2tmm1casfed8b0uvl8g65rv2df.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDZl_1q7_V9j_3mu3711tK7EYPYlnBIcFM"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1067439450635-npe4ke2tmm1casfed8b0uvl8g65rv2df.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
