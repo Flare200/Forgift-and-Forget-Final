@@ -40,15 +40,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         findViewById(R.id.newUserButton).setOnClickListener(this);
         findViewById(R.id.loginButton).setOnClickListener(this);
-        findViewById(R.id.debugButton).setOnClickListener(this);
     }
 
 
 
     // switch statement to handle all button clicks by id
     @Override
-    public void onClick(View view) {
-        switch (view.getId()) {
+    public void onClick(View view)
+    {
+        switch (view.getId())
+        {
             case R.id.newUserButton:
                 finish();
                 startActivity(new Intent(MainActivity.this, accountCreation.class));
@@ -57,14 +58,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.loginButton:
                 loginClicked();
                 break;
-
-            case R.id.debugButton:
-                sendMessage(view);
-                break;
         }
     }
 
-    private void loginClicked(){
+    private void loginClicked()
+    {
         String email = emailField.getText().toString().trim();
         String password = passwordField.getText().toString().trim();
 
@@ -122,22 +120,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             //ToDo: send UID or email to next activity (Not sure of exact DB structure yet)
         }
 
-    }
-
-    // BELOW IS FOR DEBUG ONLY DELETE WHEN DONE
-    public void sendMessage(View view)
-    {
-        Context ctx = this;
-        EditText input = (EditText) findViewById(R.id.emailField);
-        String mode = input.getText().toString();
-        Intent intent = null;
-        switch (mode)
-        {
-            case "giftIdeas":   intent = new Intent(ctx, GiftIdeas.class); break;
-            case "friend":  intent = new Intent(ctx, friendList.class); break;
-            default: intent = new Intent(ctx, friendList.class); break;
-        }
-        startActivity(intent);
     }
 }
 

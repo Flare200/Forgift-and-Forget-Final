@@ -74,6 +74,8 @@ public class entireCreation extends AppCompatActivity
             }
         });
 
-        return;
+        //return;
+        startActivity(new Intent(this,friendList.class));
+        finish();
     }
 }
