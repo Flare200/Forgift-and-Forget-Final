@@ -31,8 +31,8 @@ import static android.icu.lang.UCharacter.GraphemeClusterBreak.T;
 public class friendList extends AppCompatActivity
 {
     private Context ctx = this;
+    private ExpandableListView friendList;
 
-    ExpandableListView friendList;
     FirebaseAuth mAuth;
     database db;
     List<friend> myList = new ArrayList<friend>();
@@ -53,40 +53,55 @@ public class friendList extends AppCompatActivity
         String uid  = currentUser.getUid();
         ref         = FirebaseDatabase.getInstance().getReference("FriendsLists").child(uid);
 
-
-
         // single event, on create, to populate a list of friends(myList)
-        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+        ref.addListenerForSingleValueEvent(new ValueEventListener()
+        {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
+            public void onDataChange(DataSnapshot dataSnapshot)
+            {
                 Iterable<DataSnapshot> children = dataSnapshot.getChildren();
 
-                for (DataSnapshot child: children) {
+                for (DataSnapshot child: children)
+                {
                     friend newFriend = child.getValue(friend.class);
                     myList.add(newFriend);
                 }
             }
-
             @Override
-            public void onCancelled(DatabaseError databaseError) {
+            public void onCancelled(DatabaseError databaseError)
+            {
 
             }
+
         });
 
-
-
-
-
-
-
-
+        /*
         friendList = (ExpandableListView) findViewById(R.id.listView);
-        HashMap<String,List<String>> ideaList = new HashMap<String,List<String>>();
-        List<String> headings = new ArrayList<String>();
 
+        List<String> headerList = new ArrayList<String>();
+        HashMap<String,List<String>> eventList = new HashMap<String,List<String>>();
 
-        friendsListAdapter myAdapter = new friendsListAdapter(ctx,headings,ideaList);
+        for(int i = 0; i < myList.size(); i++)
+        {
+            friend insert = myList.get(i);
+            headerList.add(insert.getName());
+        }
+
+        //Add the events in here
+        List<String> subListEp = new ArrayList<String>();
+        subListEp.add("");
+
+        for(int i = 0; i < headerList.size(); i++)
+        {
+            eventList.put(headerList.get(i),subListEp);
+        }
+
+        friendsListAdapter myAdapter = new friendsListAdapter(ctx,headerList,eventList);
         friendList.setAdapter(myAdapter);
+
+        EditText tester = (EditText) findViewById(R.id.testText);
+        tester.setText(String.valueOf(myList.size()));
+        */
 
         //Super Basic set up
         /*
@@ -162,16 +177,56 @@ public class friendList extends AppCompatActivity
         friendList.setAdapter(myAdapter);
         */
 
-        friendList.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
+        /*friendList.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
             @Override
             public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id)
             {
                 //TextView testView = (TextView) findViewById(R.id.testText);
                 //testView.setText("CLICKED");
-                return false;
+                return true;
             }
-        });
+        });*/
+    }
 
+    @Override
+    protected void onStart()
+    {
+        super.onStart();
+        listSetUp();
+    }
+
+    private void listSetUp()
+    {
+        friendList = (ExpandableListView) findViewById(R.id.listView);
+
+        List<String> headerList = new ArrayList<String>();
+        HashMap<String,List<String>> eventList = new HashMap<String,List<String>>();
+
+        for(int i = 0; i < myList.size(); i++)
+        {
+            friend insert = myList.get(i);
+            headerList.add(insert.getName());
+        }
+
+        //Add the events in here
+        List<String> subListEp = new ArrayList<String>();
+        subListEp.add("");
+
+        for(int i = 0; i < headerList.size(); i++)
+        {
+            eventList.put(headerList.get(i),subListEp);
+        }
+
+        friendsListAdapter myAdapter = new friendsListAdapter(ctx,headerList,eventList);
+        friendList.setAdapter(myAdapter);
+
+        EditText tester = (EditText) findViewById(R.id.testText);
+        tester.setText("IN LIST SET UP");
+    }
+
+    private void setAdapterFunc(friendsListAdapter myAdapter)
+    {
+        friendList.setAdapter(myAdapter);
     }
 
     @Override
@@ -196,23 +251,9 @@ public class friendList extends AppCompatActivity
 
     private void addFriend()
     {
-        EditText test = (EditText) findViewById(R.id.testText);
-
-        String hold = null;
-        friendList = (ExpandableListView) findViewById(R.id.listView);
-
-        HashMap<String,List<String>> ideaList = new HashMap<String,List<String>>();
-        List<String> headings = new ArrayList<String>();
-        List<String> newEntire = new ArrayList<String>();
-
-        friendsListAdapter myAdapter = new friendsListAdapter(ctx,headings,ideaList);
-        friendList.setAdapter(myAdapter);
-
-        //Does not work yet please do not touch
         Intent entireIntent = new Intent(ctx,entireCreation.class);
         finish();
-        startActivityForResult(entireIntent,ADD_FRIEND_REQUEST);
-
+        startActivity(entireIntent);
     }
 
     public void userLogOut(View view)
@@ -223,21 +264,9 @@ public class friendList extends AppCompatActivity
         startActivity(intent);
     }
 
-    public void addFriend(View view){
-        Intent intent = new Intent(friendList.this, entireCreation.class);
-        startActivity(intent);
-    }
-
-    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    public void test(View view)
     {
-        // Check which request we're responding to
-        if (requestCode == ADD_FRIEND_REQUEST)
-        {
-            // Make sure the request was successful
-            if (resultCode == RESULT_OK)
-            {
-
-            }
-        }
+        EditText test = (EditText) findViewById(R.id.testText);
+        test.setText(String.valueOf(myList.size()));
     }
 }
