@@ -21,6 +21,8 @@ import com.google.firebase.auth.FirebaseUser;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener
 {
     static final int PASSWORD_MIN_LENGTH = 6;
+    static final String INVALID_PASSWORD = "The password is invalid or the user does not have a password.";
+    static final String INVALID_EMAIL = "There is no user record corresponding to this identifier. The user may have been deleted.";
     FirebaseAuth mAuth;
     EditText emailField;
     EditText passwordField;
@@ -96,9 +98,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     finish();
                     Intent intent = new Intent(MainActivity.this, friendList.class);
                     startActivity(intent);
-                    //ToDo: send UID or email to next activity (Not sure of exact DB structure yet)
                 } else {
-                    //ToDo: handle exceptions here via task.getException()
+                    String error = task.getException().getMessage().toString();
+                    switch(error){
+                        case  INVALID_PASSWORD:
+                            passwordField.requestFocus();
+                            passwordField.setError(error);
+                            break;
+                        case INVALID_EMAIL:
+                            emailField.requestFocus();
+                            emailField.setError(error);
+                            break;
+                        default:
+                            Toast.makeText(getApplicationContext(), error, Toast.LENGTH_SHORT).show();
+                            break;
+                    }
                 }
             }
         });
@@ -117,7 +131,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             finish();
             Intent intent = new Intent(MainActivity.this, friendList.class);
             startActivity(intent);
-            //ToDo: send UID or email to next activity (Not sure of exact DB structure yet)
         }
 
     }

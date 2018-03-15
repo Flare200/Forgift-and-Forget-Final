@@ -35,7 +35,7 @@ public class friendList extends AppCompatActivity
 
     FirebaseAuth mAuth;
     database db;
-    List<friend> myList = new ArrayList<friend>();
+    List<friend> friends = new ArrayList<friend>();
     DatabaseReference ref;
     FirebaseUser currentUser;
 
@@ -64,7 +64,7 @@ public class friendList extends AppCompatActivity
                 for (DataSnapshot child: children)
                 {
                     friend newFriend = child.getValue(friend.class);
-                    myList.add(newFriend);
+                    friends.add(newFriend);
                 }
             }
             @Override
@@ -202,9 +202,9 @@ public class friendList extends AppCompatActivity
         List<String> headerList = new ArrayList<String>();
         HashMap<String,List<String>> eventList = new HashMap<String,List<String>>();
 
-        for(int i = 0; i < myList.size(); i++)
+        for(int i = 0; i < friends.size(); i++)
         {
-            friend insert = myList.get(i);
+            friend insert = friends.get(i);
             headerList.add(insert.getName());
         }
 
@@ -267,6 +267,6 @@ public class friendList extends AppCompatActivity
     public void test(View view)
     {
         EditText test = (EditText) findViewById(R.id.testText);
-        test.setText(String.valueOf(myList.size()));
+        test.setText(String.valueOf(friends.size()));
     }
 }

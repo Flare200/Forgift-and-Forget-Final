@@ -6,22 +6,22 @@ package cs472.forgiftandforget.DatabaseClasses;
 
 public class friend {
     private String name;
-    private String address;
-    private String email;
-    private String date;
-    private String FID;
+    private String friendID;
+    private String eventListID;
+    private String imageID;
+    private boolean hasEvents;
 
     public friend(){
         // need public empty constructor for firebase
     }
 
-    // parametrized constructor, setting FID to null(will be updated on database addFriend function)
-    public friend(String name, String address, String email, String date){
-        this.address = address;
-        this.email = email;
+    // parametrized constructor, setting FID,ELID,imageID to null(will be updated on database addFriend method)
+    public friend(String name){
         this.name = name;
-        this.date = date;
-        this.FID = "null";
+        this.friendID = "null";
+        this.imageID = "null";
+        this.eventListID = "null";
+        this.hasEvents = false;
     }
 
 
@@ -30,20 +30,22 @@ public class friend {
 
     public void setName(String name) { this.name = name; }
 
-    public String getAddr() { return address; }
+    public String getFriendID() { return friendID; }
 
-    public void setAddr(String address) { this.address = address; }
+    public void setFriendID(String friendID) { this.friendID = friendID; }
 
-    public String getEmail() { return email; }
+    public String geteventListID() { return eventListID; }
 
-    public void setEmail(String email) { this.email = email; }
+    public void setEventListID(String eventListID) { this.eventListID = eventListID; }
 
-    public String getDate() { return date; }
+    public String getImageID() { return imageID; }
 
-    public void setDate(String date) { this.date = date;}
+    public void setImageID(String imageID) { this.imageID = imageID;}
 
-    public String getFID() {return FID; }
+    public void setHasEvents(boolean hasEvents) { this.hasEvents = hasEvents; }
 
-    public void setFID(String FID) { this.FID = FID; }
+    public boolean isHasEvents() { return hasEvents; }
+
+
 
 }
