@@ -17,6 +17,7 @@
 
     <!-- Friends List Action Bar Strings-->
     <string name="add_friend">Add Friend</string>
+    <string name="Logout">Logout</string>
 
     <string-array name="Testing_list">
         <item>Fred</item>

@@ -14,6 +14,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.*;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -23,6 +24,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import cs472.forgiftandforget.DatabaseClasses.Gift;
 import cs472.forgiftandforget.DatabaseClasses.database;
 import cs472.forgiftandforget.DatabaseClasses.friend;
 
@@ -31,11 +33,11 @@ import static android.icu.lang.UCharacter.GraphemeClusterBreak.T;
 public class friendList extends AppCompatActivity
 {
     private Context ctx = this;
+    private ExpandableListView friendList;
 
-    ExpandableListView friendList;
     FirebaseAuth mAuth;
     database db;
-    List<friend> myList = new ArrayList<friend>();
+    CopyOnWriteArrayList<friend> friends = new CopyOnWriteArrayList<>(); //this is accessed by multiple threads.
     DatabaseReference ref;
     FirebaseUser currentUser;
 
@@ -53,42 +55,54 @@ public class friendList extends AppCompatActivity
         String uid  = currentUser.getUid();
         ref         = FirebaseDatabase.getInstance().getReference("FriendsLists").child(uid);
 
-
-
         // single event, on create, to populate a list of friends(myList)
-        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+        ref.addListenerForSingleValueEvent(new ValueEventListener()
+        {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
+            public void onDataChange(DataSnapshot dataSnapshot)
+            {
                 Iterable<DataSnapshot> children = dataSnapshot.getChildren();
 
-                for (DataSnapshot child: children) {
+                for (DataSnapshot child: children)
+                {
                     friend newFriend = child.getValue(friend.class);
-                    myList.add(newFriend);
+                    friends.add(newFriend);
                 }
-            }
 
+                //Fills the list with you friends
+                friendList = (ExpandableListView) findViewById(R.id.listView);
+
+                List<String> headerList = new ArrayList<String>();
+                HashMap<String,List<String>> eventList = new HashMap<String,List<String>>();
+
+                for(int i = 0; i < friends.size(); i++)
+                {
+                    friend insert = friends.get(i);
+                    headerList.add(insert.getName());
+                }
+
+                //Add the events in here, Addes empty events for now.
+                List<String> subListEp = new ArrayList<String>();
+                subListEp.add("");
+
+                for(int i = 0; i < headerList.size(); i++)
+                {
+                    eventList.put(headerList.get(i),subListEp);
+                }
+
+                friendsListAdapter myAdapter = new friendsListAdapter(ctx,headerList,eventList);
+                friendList.setAdapter(myAdapter);
+            }
             @Override
-            public void onCancelled(DatabaseError databaseError) {
+            public void onCancelled(DatabaseError databaseError)
+            {
 
             }
+
         });
 
-
-
-
-
-
-
-
-        friendList = (ExpandableListView) findViewById(R.id.listView);
-        HashMap<String,List<String>> ideaList = new HashMap<String,List<String>>();
-        List<String> headings = new ArrayList<String>();
-
-
-        friendsListAdapter myAdapter = new friendsListAdapter(ctx,headings,ideaList);
-        friendList.setAdapter(myAdapter);
-
-        //Super Basic set up
+        //Super Basic set up Do not remove Aaron will remove at a later date
+        //==========================================================================================
         /*
         friendList = (ExpandableListView) findViewById(R.id.listView);
 
@@ -161,23 +175,24 @@ public class friendList extends AppCompatActivity
         friendsListAdapter myAdapter = new friendsListAdapter(this,headings,ideaList);
         friendList.setAdapter(myAdapter);
         */
+        //==========================================================================================
 
-        friendList.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
+        /*friendList.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
             @Override
             public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id)
             {
                 //TextView testView = (TextView) findViewById(R.id.testText);
                 //testView.setText("CLICKED");
-                return false;
+                return true;
             }
-        });
-
+        });*/
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
         getMenuInflater().inflate(R.menu.friendslist_menu_resource,menu);
+        getMenuInflater().inflate(R.menu.block_menu_resource,menu);
         return true;
     }
 
@@ -185,9 +200,13 @@ public class friendList extends AppCompatActivity
     public boolean onOptionsItemSelected(MenuItem item)
     {
         // Handle item selection
-        switch (item.getItemId()) {
+        switch (item.getItemId())
+        {
             case R.id.action_add:
                 addFriend();
+                return true;
+            case R.id.action_Logout:
+                userLogOut();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -196,48 +215,16 @@ public class friendList extends AppCompatActivity
 
     private void addFriend()
     {
-        EditText test = (EditText) findViewById(R.id.testText);
-
-        String hold = null;
-        friendList = (ExpandableListView) findViewById(R.id.listView);
-
-        HashMap<String,List<String>> ideaList = new HashMap<String,List<String>>();
-        List<String> headings = new ArrayList<String>();
-        List<String> newEntire = new ArrayList<String>();
-
-        friendsListAdapter myAdapter = new friendsListAdapter(ctx,headings,ideaList);
-        friendList.setAdapter(myAdapter);
-
-        //Does not work yet please do not touch
         Intent entireIntent = new Intent(ctx,entireCreation.class);
         finish();
-        startActivityForResult(entireIntent,ADD_FRIEND_REQUEST);
-
+        startActivity(entireIntent);
     }
 
-    public void userLogOut(View view)
+    public void userLogOut()
     {
         FirebaseAuth.getInstance().signOut();
         finish();
         Intent intent = new Intent(ctx, MainActivity.class);
         startActivity(intent);
-    }
-
-    public void addFriend(View view){
-        Intent intent = new Intent(friendList.this, entireCreation.class);
-        startActivity(intent);
-    }
-
-    protected void onActivityResult(int requestCode, int resultCode, Intent data)
-    {
-        // Check which request we're responding to
-        if (requestCode == ADD_FRIEND_REQUEST)
-        {
-            // Make sure the request was successful
-            if (resultCode == RESULT_OK)
-            {
-
-            }
-        }
     }
 }
