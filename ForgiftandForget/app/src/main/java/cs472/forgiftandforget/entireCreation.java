@@ -3,6 +3,7 @@ package cs472.forgiftandforget;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.EditText;
 
@@ -39,7 +40,8 @@ public class entireCreation extends AppCompatActivity
         db = new database();
     }
 
-    public void addNewFriend(View view) {
+    public void addNewFriend(View view)
+    {
         final String newName = nameField.getText().toString().trim();
         friend newFriend = new friend(newName);
         ret = db.addFriend(newFriend);
@@ -48,9 +50,20 @@ public class entireCreation extends AppCompatActivity
         } else {
             Toast.makeText(getApplicationContext(), newName + " Added to Friend's List", Toast.LENGTH_LONG).show();
         }
-        finish();
         Intent intent = new Intent(entireCreation.this, friendList.class);
+        finish();
         startActivity(intent);
-        return;
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event)
+    {
+        if(keyCode == KeyEvent.KEYCODE_BACK)
+        {
+            Intent intent = new Intent(entireCreation.this, friendList.class);
+            finish();
+            startActivity(intent);
+        }
+        return super.onKeyDown(keyCode, event);
     }
 }
