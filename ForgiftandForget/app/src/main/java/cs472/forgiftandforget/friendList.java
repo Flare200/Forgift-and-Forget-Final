@@ -14,6 +14,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.*;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -23,6 +24,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import cs472.forgiftandforget.DatabaseClasses.Gift;
 import cs472.forgiftandforget.DatabaseClasses.database;
 import cs472.forgiftandforget.DatabaseClasses.friend;
 
@@ -35,7 +37,7 @@ public class friendList extends AppCompatActivity
 
     FirebaseAuth mAuth;
     database db;
-    List<friend> friends = new ArrayList<friend>();
+    CopyOnWriteArrayList<friend> friends = new CopyOnWriteArrayList<>(); //this is accessed by multiple threads.
     DatabaseReference ref;
     FirebaseUser currentUser;
 
