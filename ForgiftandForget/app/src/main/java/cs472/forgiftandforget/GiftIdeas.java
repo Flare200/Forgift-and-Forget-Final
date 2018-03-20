@@ -3,6 +3,7 @@ package cs472.forgiftandforget;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
@@ -15,8 +16,9 @@ import java.io.FileNotFoundException;
 
 public class GiftIdeas extends AppCompatActivity {
 
-    ImageView photo;
+    ImageView photo[] = new ImageView[3];
     Button photoButton;
+    Bitmap defaultBitmap = null;
     Uri imageUri;
     private static final int PICK_IMAGE = 100;
 
@@ -26,8 +28,12 @@ public class GiftIdeas extends AppCompatActivity {
         setContentView(R.layout.activity_gift_ideas);
 
         photoButton = (Button)findViewById(R.id.giftPhotoButtonGallery);
-        photo = (ImageView)findViewById(R.id.giftPhoto);
-
+        photo[0] = (ImageView)findViewById(R.id.giftPhoto1);
+        photo[1] = (ImageView)findViewById(R.id.giftPhoto2);
+        photo[2] = (ImageView)findViewById(R.id.giftPhoto3);
+        photo[0].setImageBitmap(null);
+        photo[1].setImageBitmap(null);
+        photo[2].setImageBitmap(null);
         photoButton.setOnClickListener(new Button.OnClickListener(){
 
             @Override
@@ -36,6 +42,7 @@ public class GiftIdeas extends AppCompatActivity {
                 Intent intent = new Intent(Intent.ACTION_PICK,
                         android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 startActivityForResult(intent, 0);
+
             }});
     }
 
@@ -54,7 +61,9 @@ public class GiftIdeas extends AppCompatActivity {
             Bitmap bitmap;
             try {
                 bitmap = BitmapFactory.decodeStream(getContentResolver().openInputStream(targetUri));
-                photo.setImageBitmap(bitmap);
+                if(defaultBitmap ==((BitmapDrawable)photo[0].getDrawable()).getBitmap()) {photo[0].setImageBitmap(bitmap);}
+                else if(defaultBitmap ==((BitmapDrawable)photo[1].getDrawable()).getBitmap()) {photo[1].setImageBitmap(bitmap);}
+                else if(defaultBitmap ==((BitmapDrawable)photo[2].getDrawable()).getBitmap()) {photo[2].setImageBitmap(bitmap);}
             } catch (FileNotFoundException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();

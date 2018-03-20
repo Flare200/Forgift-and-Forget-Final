@@ -10,28 +10,49 @@
         android:id="@+id/giftPhotoButtonGallery"
         android:layout_width="162dp"
         android:layout_height="59dp"
-        android:layout_marginStart="16dp"
+        android:layout_marginLeft="28dp"
+        android:layout_marginTop="204dp"
         android:text="@string/giftIdeaGallery"
-        app:layout_constraintStart_toEndOf="@+id/giftPhoto"
-        app:layout_constraintTop_toTopOf="@+id/giftPhoto" />
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/giftPhoto1" />
 
     <ImageView
-        android:id="@+id/giftPhoto"
+        android:id="@+id/giftPhoto1"
         android:layout_width="142dp"
         android:layout_height="135dp"
         android:layout_marginLeft="16dp"
-        android:layout_marginStart="32dp"
+        android:layout_marginStart="28dp"
         android:layout_marginTop="20dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/giftIdeaName"
         app:srcCompat="@android:drawable/screen_background_light_transparent" />
 
+    <ImageView
+        android:id="@+id/giftPhoto2"
+        android:layout_width="144dp"
+        android:layout_height="136dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="20dp"
+        app:layout_constraintStart_toEndOf="@+id/giftPhoto1"
+        app:layout_constraintTop_toBottomOf="@+id/giftIdeaName"
+        app:srcCompat="@android:drawable/screen_background_light_transparent" />
+
+    <ImageView
+        android:id="@+id/giftPhoto3"
+        android:layout_width="146dp"
+        android:layout_height="138dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="28dp"
+        app:layout_constraintStart_toEndOf="@+id/giftPhotoButtonGallery"
+        app:layout_constraintTop_toBottomOf="@+id/giftPhoto2"
+        app:srcCompat="@android:drawable/screen_background_light_transparent" />
+
     <EditText
         android:id="@+id/giftIdeaNotes"
         android:layout_width="348dp"
-        android:layout_height="207dp"
-        android:layout_marginTop="172dp"
+        android:layout_height="92dp"
+        android:layout_marginTop="340dp"
         android:ems="10"
         android:hint="@string/giftIdeaNotes"
         android:inputType="textMultiLine"
