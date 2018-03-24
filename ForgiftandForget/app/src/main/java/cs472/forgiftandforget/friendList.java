@@ -26,6 +26,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import cs472.forgiftandforget.DatabaseClasses.Gift;
 import cs472.forgiftandforget.DatabaseClasses.database;
+import cs472.forgiftandforget.DatabaseClasses.event;
 import cs472.forgiftandforget.DatabaseClasses.friend;
 
 import static android.icu.lang.UCharacter.GraphemeClusterBreak.T;
@@ -38,6 +39,7 @@ public class friendList extends AppCompatActivity
     FirebaseAuth mAuth;
     database db;
     CopyOnWriteArrayList<friend> friends = new CopyOnWriteArrayList<>(); //this is accessed by multiple threads.
+    CopyOnWriteArrayList<ArrayList<event>> friendsEvents = new CopyOnWriteArrayList<>();
     DatabaseReference ref;
     FirebaseUser currentUser;
 
@@ -54,6 +56,10 @@ public class friendList extends AppCompatActivity
         currentUser = mAuth.getCurrentUser();
         String uid  = currentUser.getUid();
         ref         = FirebaseDatabase.getInstance().getReference("FriendsLists").child(uid);
+        db          = new database();
+        friendList  = (ExpandableListView) findViewById(R.id.listView);
+        final List<String> headerList = new ArrayList<String>();
+        final HashMap<String,List<String>> eventList = new HashMap<String,List<String>>();
 
         // single event, on create, to populate a list of friends(myList)
         ref.addListenerForSingleValueEvent(new ValueEventListener()
@@ -63,35 +69,70 @@ public class friendList extends AppCompatActivity
             {
                 Iterable<DataSnapshot> children = dataSnapshot.getChildren();
 
+                // add each of the users friends to the list friends
                 for (DataSnapshot child: children)
                 {
                     friend newFriend = child.getValue(friend.class);
                     friends.add(newFriend);
                 }
 
-                //Fills the list with you friends
-                friendList = (ExpandableListView) findViewById(R.id.listView);
-
-                List<String> headerList = new ArrayList<String>();
-                HashMap<String,List<String>> eventList = new HashMap<String,List<String>>();
-
+                //for each friend in the list get all events for the friend, add them to ExpandableList
                 for(int i = 0; i < friends.size(); i++)
                 {
-                    friend insert = friends.get(i);
-                    headerList.add(insert.getName());
+                    final friend thisFriend = friends.get(i);
+                    final int loc = i;
+                    //getting reference to specific event list
+                    DatabaseReference thisRef = FirebaseDatabase.getInstance().getReference("EventLists").child(thisFriend.geteventListID());
+                    thisRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            Iterable<DataSnapshot> Children = dataSnapshot.getChildren();
+                            ArrayList<event> events = new ArrayList<event>();
+                            // getting all events and adding to the list events
+                            // Except for the null event which is added on friend creation(to hold database spot)
+                            for (DataSnapshot Child: Children)
+                            {
+                                event thisEvent = Child.getValue(event.class);
+                                if(!thisEvent.getEid().equals("null")){
+                                    events.add(thisEvent);
+                                }
+                            }
+                            // add list of events to the list friendsEvents
+                            friendsEvents.add(events);
+
+                            // insert friend name into top level expandableList
+                            friend insert = friends.get(loc);
+                            headerList.add(insert.getName());
+
+
+                            // create the sublist for the above added friend
+                            List<String> subListEp = new ArrayList<String>();
+                            // add each event to the sublist
+                            for(int j = 0; j < friendsEvents.get(loc).size(); j++)
+                            {
+                                subListEp.add(friendsEvents.get(loc).get(j).getName());
+                            }
+                            // add sublist into lower level expandableList
+                            eventList.put(headerList.get(loc),subListEp);
+
+                            // if all friends+events have been loaded, display expandableList
+                            if(loc == friends.size()-1)
+                            {
+                                friendsListAdapter myAdapter = new friendsListAdapter(ctx,headerList,eventList);
+                                friendList.setAdapter(myAdapter);
+                            }
+
+
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
                 }
 
-                //Add the events in here, Addes empty events for now.
-                List<String> subListEp = new ArrayList<String>();
-                subListEp.add("");
 
-                for(int i = 0; i < headerList.size(); i++)
-                {
-                    eventList.put(headerList.get(i),subListEp);
-                }
-
-                friendsListAdapter myAdapter = new friendsListAdapter(ctx,headerList,eventList);
-                friendList.setAdapter(myAdapter);
             }
             @Override
             public void onCancelled(DatabaseError databaseError)
@@ -100,6 +141,10 @@ public class friendList extends AppCompatActivity
             }
 
         });
+
+
+
+
 
         //Super Basic set up Do not remove Aaron will remove at a later date
         //==========================================================================================
@@ -227,4 +272,5 @@ public class friendList extends AppCompatActivity
         Intent intent = new Intent(ctx, MainActivity.class);
         startActivity(intent);
     }
+
 }

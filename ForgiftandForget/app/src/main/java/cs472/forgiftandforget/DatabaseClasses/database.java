@@ -33,26 +33,23 @@ public class database extends AppCompatActivity {
     private static final String TAG = "this";
     FirebaseAuth mAuth;
     FirebaseUser currentUser;
-    FirebaseDatabase dataBase;
     DatabaseReference ref;
-    DatabaseReference imagesRef;
     DatabaseReference eventListRef;
-    DatabaseReference secondaryRef;
     String uid;
     int code;       // return value, 0 success, non zero specific error codes
 
     public database(){
-        // empty constructor
+        mAuth = FirebaseAuth.getInstance();
+        currentUser = mAuth.getCurrentUser();
+        uid = currentUser.getUid();
     }
 
     //accepts a friend object, to add to the current users friends list
     public int addFriend(friend newFriend){
-        mAuth = FirebaseAuth.getInstance();
-        currentUser = mAuth.getCurrentUser();
-        uid = currentUser.getUid();
 
         //get database reference to the node of the logged in UID
         ref = FirebaseDatabase.getInstance().getReference("FriendsLists").child(uid);
+        final event blankEvent = new event("blank", "blank");
         // get references to images and event list nodes
         eventListRef = FirebaseDatabase.getInstance().getReference("EventLists");
 
@@ -73,7 +70,7 @@ public class database extends AppCompatActivity {
                     code = 1;
                 } else {
                     // completed successfully
-                    eventListRef.child(ELID).child("eventCount").setValue(0);
+                    eventListRef.child(ELID).child("blankEvent").setValue(blankEvent);
                     code = 0;
                 }
             }
@@ -83,18 +80,15 @@ public class database extends AppCompatActivity {
 
     // accepts the event list id, and an event object to add to the corresponding event list
     public int addEvent(String ELID, String FID, event newEvent){
-        mAuth = FirebaseAuth.getInstance();
-        currentUser = mAuth.getCurrentUser();
-        uid = currentUser.getUid();
 
 
         //get reference to specific event list
-        ref = FirebaseDatabase.getInstance().getReference("EventLists").child(ELID);
-        secondaryRef = FirebaseDatabase.getInstance().getReference("FriendsLists").child(uid).child(FID);
+        eventListRef = FirebaseDatabase.getInstance().getReference("EventLists").child(ELID);
+        ref = FirebaseDatabase.getInstance().getReference("FriendsLists").child(uid).child(FID);
         final String EID = ref.push().getKey();
         newEvent.setEid(EID);
         //add new value
-        ref.child(EID).setValue(newEvent, new DatabaseReference.CompletionListener() {
+        eventListRef.child(EID).setValue(newEvent, new DatabaseReference.CompletionListener() {
             @Override
             public void onComplete(DatabaseError error, DatabaseReference databaseReference) {
                 if(error != null){
@@ -102,7 +96,7 @@ public class database extends AppCompatActivity {
                     code = 1;
                 }else{
                     //success
-                    secondaryRef.child("hasEvents").setValue(true);
+                    ref.child("hasEvents").setValue(true);
                     code = 0;
                 }
             }
@@ -110,5 +104,91 @@ public class database extends AppCompatActivity {
 
 
         return code;
+    }
+
+    public void removeFriend(String FID){
+
+        ref = FirebaseDatabase.getInstance().getReference("FriendsLists").child(uid).child(FID);
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                String ELID;
+                String imageID;
+                ELID = dataSnapshot.child("eventListID").getValue().toString();
+                imageID = dataSnapshot.child("imageID").getValue().toString();
+                ref.removeValue();
+                removeEventList(ELID);
+                // something to remove image possibly
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    public void removeEventList(String ELID){
+        ref = FirebaseDatabase.getInstance().getReference("EventLists").child(ELID);
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Iterable<DataSnapshot> children = dataSnapshot.getChildren();
+                for (DataSnapshot Child: children)
+                {
+                    String EID = Child.child("eid").getValue().toString();
+                    removeEvent(EID);
+                }
+
+                ref.removeValue();
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+    }
+
+    public void removeEvent(String EID){
+        // need a separate new reference for each call, as it is called in a loop from removeEventList
+        final DatabaseReference eventRef = FirebaseDatabase.getInstance().getReference("GiftLists").child(EID);
+        eventRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Iterable<DataSnapshot> children = dataSnapshot.getChildren();
+                for (DataSnapshot Child: children)
+                {
+                    String GID = Child.child("gid").getValue().toString();
+                    removeGift(GID);
+                }
+                eventRef.removeValue();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    public void removeGift(String GID){
+        // need a separate new reference for each call, as it is called in a loop from removeEvent
+        final DatabaseReference giftRef = FirebaseDatabase.getInstance().getReference("Gifts").child(GID);
+        giftRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                String imageID = dataSnapshot.child("imageId").toString();
+                // delete from image collection
+                giftRef.removeValue();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 }
