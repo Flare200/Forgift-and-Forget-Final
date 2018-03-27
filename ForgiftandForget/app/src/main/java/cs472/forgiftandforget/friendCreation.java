@@ -7,18 +7,14 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.widget.EditText;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 
 import cs472.forgiftandforget.DatabaseClasses.database;
 import cs472.forgiftandforget.DatabaseClasses.friend;
 
 import android.widget.Toast;
 
-public class entireCreation extends AppCompatActivity
+public class friendCreation extends AppCompatActivity
 {
     DatabaseReference ref;
     EditText nameField;
@@ -32,7 +28,7 @@ public class entireCreation extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_entire_creation);
+        setContentView(R.layout.activity_friend_creation);
         nameField  = (EditText) findViewById(R.id.nameField);
         dateField  = (EditText) findViewById(R.id.dateField);
         emailField  = (EditText) findViewById(R.id.emailField);
@@ -50,7 +46,7 @@ public class entireCreation extends AppCompatActivity
         } else {
             Toast.makeText(getApplicationContext(), newName + " Added to Friend's List", Toast.LENGTH_LONG).show();
         }
-        Intent intent = new Intent(entireCreation.this, friendList.class);
+        Intent intent = new Intent(friendCreation.this, friendList.class);
         finish();
         startActivity(intent);
     }
@@ -60,7 +56,7 @@ public class entireCreation extends AppCompatActivity
     {
         if(keyCode == KeyEvent.KEYCODE_BACK)
         {
-            Intent intent = new Intent(entireCreation.this, friendList.class);
+            Intent intent = new Intent(friendCreation.this, friendList.class);
             finish();
             startActivity(intent);
         }

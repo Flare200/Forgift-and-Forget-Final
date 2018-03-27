@@ -2,15 +2,16 @@ package cs472.forgiftandforget;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.ExpandableListView;
-import android.widget.Toast;
+import android.widget.TextView;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -24,17 +25,15 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import cs472.forgiftandforget.DatabaseClasses.Gift;
 import cs472.forgiftandforget.DatabaseClasses.database;
 import cs472.forgiftandforget.DatabaseClasses.event;
 import cs472.forgiftandforget.DatabaseClasses.friend;
-
-import static android.icu.lang.UCharacter.GraphemeClusterBreak.T;
 
 public class friendList extends AppCompatActivity
 {
     private Context ctx = this;
     private ExpandableListView friendList;
+    private  friendsListAdapter myAdapter;
 
     FirebaseAuth mAuth;
     database db;
@@ -106,19 +105,27 @@ public class friendList extends AppCompatActivity
 
 
                             // create the sublist for the above added friend
-                            List<String> subListEp = new ArrayList<String>();
+                            List<String> subList = new ArrayList<String>();
                             // add each event to the sublist
-                            for(int j = 0; j < friendsEvents.get(loc).size(); j++)
+                            if(friendsEvents.get(loc).size() == 0)
                             {
-                                subListEp.add(friendsEvents.get(loc).get(j).getName());
+                                subList.add("~Click to add an event~");
+                            }
+                            else
+                            {
+                                for (int j = 0; j < friendsEvents.get(loc).size(); j++)
+                                {
+                                    subList.add(friendsEvents.get(loc).get(j).getName());
+                                }
+                                subList.add("~Click to add an event~");
                             }
                             // add sublist into lower level expandableList
-                            eventList.put(headerList.get(loc),subListEp);
+                            eventList.put(headerList.get(loc),subList);
 
                             // if all friends+events have been loaded, display expandableList
                             if(loc == friends.size()-1)
                             {
-                                friendsListAdapter myAdapter = new friendsListAdapter(ctx,headerList,eventList);
+                                myAdapter = new friendsListAdapter(ctx,headerList,eventList);
                                 friendList.setAdapter(myAdapter);
                             }
 
@@ -131,106 +138,31 @@ public class friendList extends AppCompatActivity
                         }
                     });
                 }
-
-
             }
             @Override
             public void onCancelled(DatabaseError databaseError)
             {
 
             }
-
         });
 
-
-
-
-
-        //Super Basic set up Do not remove Aaron will remove at a later date
-        //==========================================================================================
-        /*
-        friendList = (ExpandableListView) findViewById(R.id.listView);
-
-        HashMap<String,List<String>> ideaList = new HashMap<String,List<String>>();
-
-        String friends[] = getResources().getStringArray(R.array.Testing_list);
-        String sl01[] = getResources().getStringArray(R.array.Fred_list);
-        String sl02[] = getResources().getStringArray(R.array.Grace_list);
-        String sl03[] = getResources().getStringArray(R.array.Bob_list);
-        String sl04[] = getResources().getStringArray(R.array.Grace_list);
-        String sl05[] = getResources().getStringArray(R.array.Grace_list);
-        String sl06[] = getResources().getStringArray(R.array.Grace_list);
-        String sl07[] = getResources().getStringArray(R.array.Grace_list);
-
-        List<String> headings = new ArrayList<String>();
-        List<String> subList01 = new ArrayList<String>();
-        List<String> subList02 = new ArrayList<String>();
-        List<String> subList03 = new ArrayList<String>();
-        List<String> subList04 = new ArrayList<String>();
-        List<String> subList05 = new ArrayList<String>();
-        List<String> subList06 = new ArrayList<String>();
-        List<String> subList07 = new ArrayList<String>();
-        List<String> subListEp = new ArrayList<String>();
-
-
-
-        for(String title : friends)
+        //Handler to add events to the list
+        friendList.setOnChildClickListener(new ExpandableListView.OnChildClickListener()
         {
-            headings.add(title);
-        }
-        for(String title : sl01)
-        {
-            subList01.add(title);
-        }
-        for(String title : sl02)
-        {
-            subList02.add(title);
-        }
-        for(String title : sl03)
-        {
-            subList03.add(title);
-        }
-        for(String title : sl04)
-        {
-            subList04.add(title);
-        }
-        for(String title : sl05)
-        {
-            subList05.add(title);
-        }
-        for(String title : sl06)
-        {
-            subList06.add(title);
-        }
-        for(String title : sl07)
-        {
-            subList07.add(title);
-        }
-        headings.add("TEST");
-        subListEp.add("");
-
-        ideaList.put(headings.get(0),subList01);
-        ideaList.put(headings.get(1),subList02);
-        ideaList.put(headings.get(2),subList03);
-        ideaList.put(headings.get(3),subList02);
-        ideaList.put(headings.get(4),subList02);
-        ideaList.put(headings.get(5),subList02);
-        ideaList.put(headings.get(6),subList02);
-        ideaList.put(headings.get(7),subListEp);
-        friendsListAdapter myAdapter = new friendsListAdapter(this,headings,ideaList);
-        friendList.setAdapter(myAdapter);
-        */
-        //==========================================================================================
-
-        /*friendList.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
             @Override
-            public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id)
+            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id)
             {
-                //TextView testView = (TextView) findViewById(R.id.testText);
-                //testView.setText("CLICKED");
-                return true;
+                if(childPosition ==  myAdapter.getChildrenCount(groupPosition)-1)
+                    addEvent(friends.get(groupPosition));
+                else
+                {
+                    List<String> events = eventList.get(friends.get(groupPosition).getName());
+                    openIdeaPage(events.get(childPosition).toString());//Need to replace with the actual event class
+                }
+
+                return false;
             }
-        });*/
+        });
     }
 
     @Override
@@ -260,17 +192,33 @@ public class friendList extends AppCompatActivity
 
     private void addFriend()
     {
-        Intent entireIntent = new Intent(ctx,entireCreation.class);
+        Intent friendIntent = new Intent(ctx,friendCreation.class);
         finish();
-        startActivity(entireIntent);
+        startActivity(friendIntent);
     }
 
-    public void userLogOut()
+    private void addEvent(friend currentFriend)
+    {
+        Intent eventIntent = new Intent(ctx,eventCreation.class);
+        eventIntent.putExtra("ELID",currentFriend.geteventListID());
+        eventIntent.putExtra("FID",currentFriend.getFriendID());
+        finish();
+        startActivity(eventIntent);
+    }
+
+    private void openIdeaPage(String eventName)
+    {
+        Intent ideaIntent = new Intent(ctx,ideaPage.class);
+        ideaIntent.putExtra("event",eventName);
+        finish();
+        startActivity(ideaIntent);
+    }
+
+    private void userLogOut()
     {
         FirebaseAuth.getInstance().signOut();
         finish();
         Intent intent = new Intent(ctx, MainActivity.class);
         startActivity(intent);
     }
-
 }
