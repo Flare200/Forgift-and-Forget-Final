@@ -34,7 +34,7 @@ public class friend {
 
     public void setFriendID(String friendID) { this.friendID = friendID; }
 
-    public String geteventListID() { return eventListID; }
+    public String getEventListID() { return eventListID; }
 
     public void setEventListID(String eventListID) { this.eventListID = eventListID; }
 

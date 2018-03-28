@@ -81,7 +81,7 @@ public class friendList extends AppCompatActivity
                     final friend thisFriend = friends.get(i);
                     final int loc = i;
                     //getting reference to specific event list
-                    DatabaseReference thisRef = FirebaseDatabase.getInstance().getReference("EventLists").child(thisFriend.geteventListID());
+                    DatabaseReference thisRef = FirebaseDatabase.getInstance().getReference("EventLists").child(thisFriend.getEventListID());
                     thisRef.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
@@ -200,7 +200,7 @@ public class friendList extends AppCompatActivity
     private void addEvent(friend currentFriend)
     {
         Intent eventIntent = new Intent(ctx,eventCreation.class);
-        eventIntent.putExtra("ELID",currentFriend.geteventListID());
+        eventIntent.putExtra("ELID",currentFriend.getEventListID());
         eventIntent.putExtra("FID",currentFriend.getFriendID());
         finish();
         startActivity(eventIntent);
