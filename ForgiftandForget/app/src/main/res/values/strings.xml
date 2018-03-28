@@ -19,40 +19,15 @@
     <string name="add_friend">Add Friend</string>
     <string name="Logout">Logout</string>
 
-    <string-array name="Testing_list">
-        <item>Fred</item>
-        <item>Grace</item>
-        <item>Bob</item>
-        <item>Grace</item>
-        <item>Grace</item>
-        <item>Grace</item>
-        <item>Grace</item>
-    </string-array>
-
-
-    <string-array name="Fred_list">
-        <item>Car</item>
-        <item>Books</item>
-    </string-array>
-
-    <string-array name="Grace_list">
-        <item>Borard Games</item>
-        <item>Cat Stuff</item>
-        <item>Shirt</item>
-    </string-array>
-
-    <string-array name="Bob_list">
-        <item>No ideas yet</item>
-    </string-array>
-
-    <string-array name="friendSpinnerOpt">
-        <item>Add Friend</item>
-        <item>Delete Friend</item>
-    </string-array>
-
 
     <!-- Gift Idea Strings -->
     <string name="giftIdeaName">Name</string>
     <string name="giftIdeaNotes">Notes</string>
     <string name="giftIdeaGallery">Pick From Gallery</string>
+
+    <!-- Event Creation Strings -->
+    <string name="Event">Event</string>
+    <string name="Date">Date: mm-dd-yyyy</string>
+    <string name="Time">Time</string>
+    <string name="Add_Event">Add Event</string>
 </resources>
