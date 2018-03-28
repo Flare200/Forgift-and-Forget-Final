@@ -8,8 +8,11 @@ https://confluence.atlassian.com/bitbucketserver/basic-git-commands-776639767.ht
 
 Code Naming Conventions
 * Variable Naming
+  
   variableNameWithManyWords
 * Function Naming
+  
   FunctionNameWithManyWords
 * Class Naming
+  
   ClassName
