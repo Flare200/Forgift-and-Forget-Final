@@ -11,8 +11,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
+//import com.google.firebase.storage.FirebaseStorage;
+//import com.google.firebase.storage.StorageReference;
 
 /**
  * Created by mike_ on 3/7/2018.
@@ -25,7 +25,7 @@ public class database extends AppCompatActivity {
     FirebaseUser currentUser;
     DatabaseReference ref;
     DatabaseReference eventListRef;
-    StorageReference storageRef;
+    //StorageReference storageRef;
     String uid;
     int code;       // return value, 0 success, non zero specific error codes
 
@@ -43,7 +43,7 @@ public class database extends AppCompatActivity {
         final event blankEvent = new event("blank", "blank");
         // get references to images and event list nodes
         eventListRef = FirebaseDatabase.getInstance().getReference("EventLists");
-        storageRef = FirebaseStorage.getInstance().getReference().child("contactImages");
+        //storageRef = FirebaseStorage.getInstance().getReference().child("contactImages");
 
         //push new unique new keys, load into newFriend object
         final String FID = ref.push().getKey();
@@ -63,9 +63,9 @@ public class database extends AppCompatActivity {
                 } else {
                     // completed successfully
                     eventListRef.child(ELID).child("blankEvent").setValue(blankEvent);
-                    if (uri != null) {
+                    /*if (uri != null) {
                         storageRef.child(imageID).putFile(uri);
-                    }
+                    }*/
                     code = 0;
                 }
             }

@@ -20,8 +20,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
+//import com.google.firebase.storage.FirebaseStorage;
+//import com.google.firebase.storage.StorageReference;
 
 import cs472.forgiftandforget.DatabaseClasses.database;
 import cs472.forgiftandforget.DatabaseClasses.event;
@@ -39,7 +39,7 @@ public class friendList extends AppCompatActivity
     CopyOnWriteArrayList<ArrayList<event>> friendsEvents = new CopyOnWriteArrayList<>();
     DatabaseReference ref;
     FirebaseUser currentUser;
-    StorageReference storageRef;
+    //StorageReference storageRef;
 
 
     static final int ADD_FRIEND_REQUEST = 1;
@@ -56,7 +56,7 @@ public class friendList extends AppCompatActivity
         ref         = FirebaseDatabase.getInstance().getReference("FriendsLists").child(uid);
         db          = new database();
         friendList  = (ExpandableListView) findViewById(R.id.listView);
-        storageRef  = FirebaseStorage.getInstance().getReference().child("contactImages");
+        //storageRef  = FirebaseStorage.getInstance().getReference().child("contactImages");
         final List<String> headerList = new ArrayList<String>();
         final HashMap<String,List<String>> eventList = new HashMap<String,List<String>>();
 
