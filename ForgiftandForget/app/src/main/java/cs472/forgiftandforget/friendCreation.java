@@ -1,27 +1,28 @@
 package cs472.forgiftandforget;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.EditText;
-
-import com.google.firebase.database.DatabaseReference;
-
 import cs472.forgiftandforget.DatabaseClasses.database;
 import cs472.forgiftandforget.DatabaseClasses.friend;
-
+import android.widget.ImageView;
 import android.widget.Toast;
+import java.io.FileNotFoundException;
 
-public class friendCreation extends AppCompatActivity
+public class friendCreation extends AppCompatActivity implements View.OnClickListener
 {
-    DatabaseReference ref;
     EditText nameField;
-    EditText dateField;
-    EditText emailField;
-    EditText addressField;
     database db;
+    ImageView friendImage;
+    static final int GALLERY = 1;
+    Uri uri;
     int ret;
 
     @Override
@@ -29,18 +30,17 @@ public class friendCreation extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_friend_creation);
-        nameField  = (EditText) findViewById(R.id.nameField);
-        dateField  = (EditText) findViewById(R.id.dateField);
-        emailField  = (EditText) findViewById(R.id.emailField);
-        addressField  = (EditText) findViewById(R.id.addressField);
+        friendImage = (ImageView) findViewById(R.id.contactImage);
+        nameField = (EditText) findViewById(R.id.nameField);
         db = new database();
+        friendImage.setOnClickListener(this);
     }
 
     public void addNewFriend(View view)
     {
         final String newName = nameField.getText().toString().trim();
         friend newFriend = new friend(newName);
-        ret = db.addFriend(newFriend);
+        ret = db.addFriend(newFriend, uri);
         if (ret != 0) {
             Toast.makeText(getApplicationContext(), "Could not add Friend", Toast.LENGTH_LONG).show();
         } else {
@@ -50,6 +50,7 @@ public class friendCreation extends AppCompatActivity
         finish();
         startActivity(intent);
     }
+
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event)
@@ -62,4 +63,30 @@ public class friendCreation extends AppCompatActivity
         }
         return super.onKeyDown(keyCode, event);
     }
+
+    @Override
+    public void onClick(View v) {
+        Intent gallery = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
+        gallery.putExtra(MediaStore.EXTRA_OUTPUT, uri);
+        startActivityForResult(gallery, GALLERY);
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+
+        if (requestCode == GALLERY && resultCode == RESULT_OK) {
+            uri = data.getData();
+            Bitmap bitmap;
+            try {
+                bitmap = BitmapFactory.decodeStream(getContentResolver().openInputStream(uri));
+                friendImage.setImageBitmap(bitmap);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }
+

@@ -1,5 +1,7 @@
 package cs472.forgiftandforget.DatabaseClasses;
 
+
+import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -9,6 +11,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 /**
  * Created by mike_ on 3/7/2018.
@@ -21,6 +25,7 @@ public class database extends AppCompatActivity {
     FirebaseUser currentUser;
     DatabaseReference ref;
     DatabaseReference eventListRef;
+    StorageReference storageRef;
     String uid;
     int code;       // return value, 0 success, non zero specific error codes
 
@@ -31,13 +36,14 @@ public class database extends AppCompatActivity {
     }
 
     //accepts a friend object, to add to the current users friends list
-    public int addFriend(friend newFriend){
+    public int addFriend(friend newFriend, final Uri uri){
 
         //get database reference to the node of the logged in UID
         ref = FirebaseDatabase.getInstance().getReference("FriendsLists").child(uid);
         final event blankEvent = new event("blank", "blank");
         // get references to images and event list nodes
         eventListRef = FirebaseDatabase.getInstance().getReference("EventLists");
+        storageRef = FirebaseStorage.getInstance().getReference().child("contactImages");
 
         //push new unique new keys, load into newFriend object
         final String FID = ref.push().getKey();
@@ -57,6 +63,9 @@ public class database extends AppCompatActivity {
                 } else {
                     // completed successfully
                     eventListRef.child(ELID).child("blankEvent").setValue(blankEvent);
+                    if (uri != null) {
+                        storageRef.child(imageID).putFile(uri);
+                    }
                     code = 0;
                 }
             }

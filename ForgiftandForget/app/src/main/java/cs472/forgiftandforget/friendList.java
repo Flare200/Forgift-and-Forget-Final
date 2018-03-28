@@ -2,16 +2,12 @@ package cs472.forgiftandforget;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ExpandableListView;
-import android.widget.TextView;
-
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -24,6 +20,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import cs472.forgiftandforget.DatabaseClasses.database;
 import cs472.forgiftandforget.DatabaseClasses.event;
@@ -33,7 +31,7 @@ public class friendList extends AppCompatActivity
 {
     private Context ctx = this;
     private ExpandableListView friendList;
-    private  friendsListAdapter myAdapter;
+    private friendsListAdapter myAdapter;
 
     FirebaseAuth mAuth;
     database db;
@@ -41,6 +39,7 @@ public class friendList extends AppCompatActivity
     CopyOnWriteArrayList<ArrayList<event>> friendsEvents = new CopyOnWriteArrayList<>();
     DatabaseReference ref;
     FirebaseUser currentUser;
+    StorageReference storageRef;
 
 
     static final int ADD_FRIEND_REQUEST = 1;
@@ -57,6 +56,7 @@ public class friendList extends AppCompatActivity
         ref         = FirebaseDatabase.getInstance().getReference("FriendsLists").child(uid);
         db          = new database();
         friendList  = (ExpandableListView) findViewById(R.id.listView);
+        storageRef  = FirebaseStorage.getInstance().getReference().child("contactImages");
         final List<String> headerList = new ArrayList<String>();
         final HashMap<String,List<String>> eventList = new HashMap<String,List<String>>();
 
