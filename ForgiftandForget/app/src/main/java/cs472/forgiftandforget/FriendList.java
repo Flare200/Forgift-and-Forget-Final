@@ -8,6 +8,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ExpandableListView;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -23,202 +24,180 @@ import com.google.firebase.database.ValueEventListener;
 //import com.google.firebase.storage.FirebaseStorage;
 //import com.google.firebase.storage.StorageReference;
 
-import cs472.forgiftandforget.DatabaseClasses.database;
-import cs472.forgiftandforget.DatabaseClasses.event;
-import cs472.forgiftandforget.DatabaseClasses.friend;
+import cs472.forgiftandforget.DatabaseClasses.Database;
+import cs472.forgiftandforget.DatabaseClasses.Event;
+import cs472.forgiftandforget.DatabaseClasses.Friend;
 
-public class friendList extends AppCompatActivity
-{
-    private Context ctx = this;
-    private ExpandableListView friendList;
-    private friendsListAdapter myAdapter;
+public class FriendList extends AppCompatActivity {
+	private Context ctx = this;
+	private ExpandableListView friendList;
+	private FriendsListAdapter myAdapter;
 
-    FirebaseAuth mAuth;
-    database db;
-    CopyOnWriteArrayList<friend> friends = new CopyOnWriteArrayList<>(); //this is accessed by multiple threads.
-    CopyOnWriteArrayList<ArrayList<event>> friendsEvents = new CopyOnWriteArrayList<>();
-    DatabaseReference ref;
-    FirebaseUser currentUser;
-    //StorageReference storageRef;
-
-
-    static final int ADD_FRIEND_REQUEST = 1;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_friend_list);
-
-        mAuth       = FirebaseAuth.getInstance();
-        currentUser = mAuth.getCurrentUser();
-        String uid  = currentUser.getUid();
-        ref         = FirebaseDatabase.getInstance().getReference("FriendsLists").child(uid);
-        db          = new database();
-        friendList  = (ExpandableListView) findViewById(R.id.listView);
-        //storageRef  = FirebaseStorage.getInstance().getReference().child("contactImages");
-        final List<String> headerList = new ArrayList<String>();
-        final HashMap<String,List<String>> eventList = new HashMap<String,List<String>>();
-
-        // single event, on create, to populate a list of friends(myList)
-        ref.addListenerForSingleValueEvent(new ValueEventListener()
-        {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot)
-            {
-                Iterable<DataSnapshot> children = dataSnapshot.getChildren();
-
-                // add each of the users friends to the list friends
-                for (DataSnapshot child: children)
-                {
-                    friend newFriend = child.getValue(friend.class);
-                    friends.add(newFriend);
-                }
-
-                //for each friend in the list get all events for the friend, add them to ExpandableList
-                for(int i = 0; i < friends.size(); i++)
-                {
-                    final friend thisFriend = friends.get(i);
-                    final int loc = i;
-                    //getting reference to specific event list
-                    DatabaseReference thisRef = FirebaseDatabase.getInstance().getReference("EventLists").child(thisFriend.getEventListID());
-                    thisRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            Iterable<DataSnapshot> Children = dataSnapshot.getChildren();
-                            ArrayList<event> events = new ArrayList<event>();
-                            // getting all events and adding to the list events
-                            // Except for the null event which is added on friend creation(to hold database spot)
-                            for (DataSnapshot Child: Children)
-                            {
-                                event thisEvent = Child.getValue(event.class);
-                                if(!thisEvent.getEid().equals("null")){
-                                    events.add(thisEvent);
-                                }
-                            }
-                            // add list of events to the list friendsEvents
-                            friendsEvents.add(events);
-
-                            // insert friend name into top level expandableList
-                            friend insert = friends.get(loc);
-                            headerList.add(insert.getName());
+	FirebaseAuth mAuth;
+	Database db;
+	CopyOnWriteArrayList<Friend> friends = new CopyOnWriteArrayList<>(); //this is accessed by multiple threads.
+	CopyOnWriteArrayList<ArrayList<Event>> friendsEvents = new CopyOnWriteArrayList<>();
+	DatabaseReference ref;
+	FirebaseUser currentUser;
+	//StorageReference storageRef;
 
 
-                            // create the sublist for the above added friend
-                            List<String> subList = new ArrayList<String>();
-                            // add each event to the sublist
-                            if(friendsEvents.get(loc).size() == 0)
-                            {
-                                subList.add("~Click to add an event~");
-                            }
-                            else
-                            {
-                                for (int j = 0; j < friendsEvents.get(loc).size(); j++)
-                                {
-                                    subList.add(friendsEvents.get(loc).get(j).getName());
-                                }
-                                subList.add("~Click to add an event~");
-                            }
-                            // add sublist into lower level expandableList
-                            eventList.put(headerList.get(loc),subList);
+	static final int ADD_FRIEND_REQUEST = 1;
 
-                            // if all friends+events have been loaded, display expandableList
-                            if(loc == friends.size()-1)
-                            {
-                                myAdapter = new friendsListAdapter(ctx,headerList,eventList);
-                                friendList.setAdapter(myAdapter);
-                            }
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_friend_list);
+
+		mAuth = FirebaseAuth.getInstance();
+		currentUser = mAuth.getCurrentUser();
+		String uid = currentUser.getUid();
+		ref = FirebaseDatabase.getInstance().getReference("FriendsLists").child(uid);
+		db = new Database();
+		friendList = (ExpandableListView) findViewById(R.id.listView);
+		//storageRef  = FirebaseStorage.getInstance().getReference().child("contactImages");
+		final List<String> headerList = new ArrayList<String>();
+		final HashMap<String, List<String>> eventList = new HashMap<String, List<String>>();
+
+		// single Event, on create, to populate a list of friends(myList)
+		ref.addListenerForSingleValueEvent(new ValueEventListener() {
+			@Override
+			public void onDataChange(DataSnapshot dataSnapshot) {
+				Iterable<DataSnapshot> children = dataSnapshot.getChildren();
+
+				// add each of the users friends to the list friends
+				for (DataSnapshot child : children) {
+					Friend newFriend = child.getValue(Friend.class);
+					friends.add(newFriend);
+				}
+
+				//for each Friend in the list get all events for the Friend, add them to ExpandableList
+				for (int i = 0; i < friends.size(); i++) {
+					final Friend thisFriend = friends.get(i);
+					final int loc = i;
+					//getting reference to specific Event list
+					DatabaseReference thisRef = FirebaseDatabase.getInstance().getReference("EventLists").child(thisFriend.GetEventListID());
+					thisRef.addListenerForSingleValueEvent(new ValueEventListener() {
+						@Override
+						public void onDataChange(DataSnapshot dataSnapshot) {
+							Iterable<DataSnapshot> Children = dataSnapshot.getChildren();
+							ArrayList<Event> events = new ArrayList<Event>();
+							// getting all events and adding to the list events
+							// Except for the null Event which is added on Friend creation(to hold Database spot)
+							for (DataSnapshot Child : Children) {
+								Event thisEvent = Child.getValue(Event.class);
+								if (!thisEvent.GetEventID().equals("null")) {
+									events.add(thisEvent);
+								}
+							}
+							// add list of events to the list friendsEvents
+							friendsEvents.add(events);
+
+							// insert Friend name into top level expandableList
+							Friend insert = friends.get(loc);
+							headerList.add(insert.GetName());
 
 
-                        }
+							// create the sublist for the above added Friend
+							List<String> subList = new ArrayList<String>();
+							// add each Event to the sublist
+							if (friendsEvents.get(loc).size() == 0) {
+								subList.add("~Click to add an Event~");
+							} else {
+								for (int j = 0; j < friendsEvents.get(loc).size(); j++) {
+									subList.add(friendsEvents.get(loc).get(j).GetName());
+								}
+								subList.add("~Click to add an Event~");
+							}
+							// add sublist into lower level expandableList
+							eventList.put(headerList.get(loc), subList);
 
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
+							// if all friends+events have been loaded, display expandableList
+							if (loc == friends.size() - 1) {
+								myAdapter = new FriendsListAdapter(ctx, headerList, eventList);
+								friendList.setAdapter(myAdapter);
+							}
 
-                        }
-                    });
-                }
-            }
-            @Override
-            public void onCancelled(DatabaseError databaseError)
-            {
 
-            }
-        });
+						}
 
-        //Handler to add events to the list
-        friendList.setOnChildClickListener(new ExpandableListView.OnChildClickListener()
-        {
-            @Override
-            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id)
-            {
-                if(childPosition ==  myAdapter.getChildrenCount(groupPosition)-1)
-                    addEvent(friends.get(groupPosition));
-                else
-                {
-                    List<String> events = eventList.get(friends.get(groupPosition).getName());
-                    openIdeaPage(events.get(childPosition).toString());//Need to replace with the actual event class
-                }
+						@Override
+						public void onCancelled(DatabaseError databaseError) {
 
-                return false;
-            }
-        });
-    }
+						}
+					});
+				}
+			}
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu)
-    {
-        getMenuInflater().inflate(R.menu.friendslist_menu_resource,menu);
-        getMenuInflater().inflate(R.menu.block_menu_resource,menu);
-        return true;
-    }
+			@Override
+			public void onCancelled(DatabaseError databaseError) {
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item)
-    {
-        // Handle item selection
-        switch (item.getItemId())
-        {
-            case R.id.action_add:
-                addFriend();
-                return true;
-            case R.id.action_Logout:
-                userLogOut();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
+			}
+		});
 
-    private void addFriend()
-    {
-        Intent friendIntent = new Intent(ctx,friendCreation.class);
-        finish();
-        startActivity(friendIntent);
-    }
+		//Handler to add events to the list
+		friendList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+			@Override
+			public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+				if (childPosition == myAdapter.getChildrenCount(groupPosition) - 1)
+					addEvent(friends.get(groupPosition));
+				else {
+					List<String> events = eventList.get(friends.get(groupPosition).GetName());
+					openIdeaPage(events.get(childPosition).toString());//Need to replace with the actual Event class
+				}
 
-    private void addEvent(friend currentFriend)
-    {
-        Intent eventIntent = new Intent(ctx,eventCreation.class);
-        eventIntent.putExtra("ELID",currentFriend.getEventListID());
-        eventIntent.putExtra("FID",currentFriend.getFriendID());
-        finish();
-        startActivity(eventIntent);
-    }
+				return false;
+			}
+		});
+	}
 
-    private void openIdeaPage(String eventName)
-    {
-        Intent ideaIntent = new Intent(ctx,ideaPage.class);
-        ideaIntent.putExtra("event",eventName);
-        finish();
-        startActivity(ideaIntent);
-    }
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		getMenuInflater().inflate(R.menu.friendslist_menu_resource, menu);
+		getMenuInflater().inflate(R.menu.block_menu_resource, menu);
+		return true;
+	}
 
-    private void userLogOut()
-    {
-        FirebaseAuth.getInstance().signOut();
-        finish();
-        Intent intent = new Intent(ctx, MainActivity.class);
-        startActivity(intent);
-    }
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		// Handle item selection
+		switch (item.getItemId()) {
+			case R.id.action_add:
+				addFriend();
+				return true;
+			case R.id.action_Logout:
+				userLogOut();
+				return true;
+			default:
+				return super.onOptionsItemSelected(item);
+		}
+	}
+
+	private void addFriend() {
+		Intent friendIntent = new Intent(ctx, FriendCreation.class);
+		finish();
+		startActivity(friendIntent);
+	}
+
+	private void addEvent(Friend currentFriend) {
+		Intent eventIntent = new Intent(ctx, EventCreation.class);
+		eventIntent.putExtra("ELID", currentFriend.GetEventListID());
+		eventIntent.putExtra("FID", currentFriend.GetFriendID());
+		finish();
+		startActivity(eventIntent);
+	}
+
+	private void openIdeaPage(String eventName) {
+		Intent ideaIntent = new Intent(ctx, IdeaPage.class);
+		ideaIntent.putExtra("Event", eventName);
+		finish();
+		startActivity(ideaIntent);
+	}
+
+	private void userLogOut() {
+		FirebaseAuth.getInstance().signOut();
+		finish();
+		Intent intent = new Intent(ctx, MainActivity.class);
+		startActivity(intent);
+	}
 }

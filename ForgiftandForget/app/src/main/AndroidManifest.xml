@@ -21,13 +21,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".accountCreation" />
-        <activity android:name=".friendList" />
-        <activity android:name=".ideaPage" />
-        <activity android:name=".giftedList" />
-        <activity android:name=".friendCreation" />
+        <activity android:name=".AccountCreation" />
+        <activity android:name=".FriendList" />
+        <activity android:name=".IdeaPage" />
+        <activity android:name=".GiftedList" />
+        <activity android:name=".FriendCreation" />
         <activity android:name=".GiftIdeas" />
-        <activity android:name=".eventCreation"></activity>
+        <activity android:name=".EventCreation"></activity>
     </application>
 
 </manifest>
