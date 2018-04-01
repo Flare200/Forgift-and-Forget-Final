@@ -12,9 +12,9 @@ import com.google.firebase.database.ValueEventListener;
  */
 
 public class Event {
-	private String name;
-	private String date;
-	private String eventID;
+	public String name;
+	public String date;
+	public String eventID;
 
 	public Event() {
 		// empty constructor required for firebase
@@ -26,31 +26,6 @@ public class Event {
 		this.date = date;
 		this.eventID = "null";
 	}
-
-	public String GetName() {
-		return name;
-	}
-
-	public void SetName(String name) {
-		this.name = name;
-	}
-
-	public String GetDate() {
-		return date;
-	}
-
-	public void SetDate(String date) {
-		this.date = date;
-	}
-
-	public String GetEventID() {
-		return eventID;
-	}
-
-	public void SetEventID(String eventID) {
-		this.eventID = eventID;
-	}
-
 
 	@Exclude
 	public static DatabaseReference GetEventListsReference() {
@@ -109,7 +84,7 @@ public class Event {
 		final DatabaseReference eventListRef = GetEventListsReference().child(ELID);
 		final DatabaseReference friendsListsRef = Friend.GetFriendsListsReference().child(Database.GetCurrentUID()).child(FID);
 		final String EID = friendsListsRef.push().getKey();
-		newEvent.SetEventID(EID);
+		newEvent.eventID = EID;
 
 		//add new value
 		eventListRef.child(EID).setValue(newEvent, new DatabaseReference.CompletionListener() {

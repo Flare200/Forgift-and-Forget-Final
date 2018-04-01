@@ -12,11 +12,11 @@ import com.google.firebase.database.ValueEventListener;
  */
 
 public class Gift {
-	private String name;
-	private String description;
-	private String imageID;
-	private String url;
-	private boolean gifted;
+	public String name;
+	public String description;
+	public String imageID;
+	public String url;
+	public boolean gifted;
 
 	//Constructors
 	public Gift() {
@@ -29,48 +29,6 @@ public class Gift {
 		this.imageID = "";
 		this.gifted = false;
 	}
-
-	//Getters and setters. Do not use the getters. Do not use the setters.
-	public String GetName() {
-		return name;
-	}
-
-	public void SetName(String name) {
-		this.name = name;
-	}
-
-	public String GetDescription() {
-		return description;
-	}
-
-	public void SetDescription(String description) {
-		this.description = description;
-	}
-
-	public String GetImageID() {
-		return imageID;
-	}
-
-	public void SetImageID(String imageId) {
-		this.imageID = imageId;
-	}
-
-	public String GetUrl() {
-		return url;
-	}
-
-	public void SetUrl(String url) {
-		this.url = url;
-	}
-
-	public void SetGifted(boolean gifted) {
-		this.gifted = gifted;
-	}
-
-	public boolean IsGifted() {
-		return gifted;
-	}
-
 
 	//Useful Methods
 	@Exclude

@@ -14,11 +14,11 @@ import android.net.Uri;
  */
 
 public class Friend {
-	private String name;
-	private String friendID;
-	private String eventListID;
-	private String imageID;
-	private boolean hasEvents;
+	public String name;
+	public String friendID;
+	public String eventListID;
+	public String imageID;
+	public boolean hasEvents;
 
 	public Friend() {
 		// need public empty constructor for firebase
@@ -32,28 +32,6 @@ public class Friend {
 		this.eventListID = "null";
 		this.hasEvents = false;
 	}
-
-
-	// need public setters and getters for firebase
-	public String GetName() { return name; }
-
-	public void SetName(String name) { this.name = name; }
-
-	public String GetFriendID() { return friendID; }
-
-	public void SetFriendID(String friendID) { this.friendID = friendID; }
-
-	public String GetEventListID() { return eventListID; }
-
-	public void SetEventListID(String eventListID) { this.eventListID = eventListID; }
-
-	public String GetImageID() { return imageID; }
-
-	public void SetImageID(String imageID) { this.imageID = imageID;}
-
-	public void SetHasEvents(boolean hasEvents) { this.hasEvents = hasEvents; }
-
-	public boolean HasEvents() { return hasEvents; }
 
 
 	@Exclude
@@ -101,9 +79,9 @@ public class Friend {
 		final String ELID = eventListRef.push().getKey();
 		final String imageID = friendsListsRef.push().getKey();
 
-		newFriend.SetEventListID(ELID);
-		newFriend.SetFriendID(FID);
-		newFriend.SetImageID(imageID);
+		newFriend.eventListID = ELID;
+		newFriend.friendID = FID;
+		newFriend.imageID = imageID;
 
 		//add newFriend to users friends list inside database
 		friendsListsRef.child(FID).setValue(newFriend, new DatabaseReference.CompletionListener() {
@@ -114,7 +92,7 @@ public class Friend {
 				} else {
 					// completed successfully
 					eventListRef.child(ELID).child("blankEvent").setValue(blankEvent);
-	                /*if (uri != null) {
+		            /*if (uri != null) {
                         storageRef.child(imageID).putFile(uri);
                     }*/
 					Database.errorCode = 0;

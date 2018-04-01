@@ -76,7 +76,7 @@ public class FriendList extends AppCompatActivity {
 					final Friend thisFriend = friends.get(i);
 					final int loc = i;
 					//getting reference to specific Event list
-					DatabaseReference thisRef = FirebaseDatabase.getInstance().getReference("EventLists").child(thisFriend.GetEventListID());
+					DatabaseReference thisRef = FirebaseDatabase.getInstance().getReference("EventLists").child(thisFriend.eventListID);
 					thisRef.addListenerForSingleValueEvent(new ValueEventListener() {
 						@Override
 						public void onDataChange(DataSnapshot dataSnapshot) {
@@ -86,7 +86,7 @@ public class FriendList extends AppCompatActivity {
 							// Except for the null Event which is added on Friend creation(to hold Database spot)
 							for (DataSnapshot Child : Children) {
 								Event thisEvent = Child.getValue(Event.class);
-								if (!thisEvent.GetEventID().equals("null")) {
+								if (thisEvent.eventID != null && thisEvent.eventID != "null") {
 									events.add(thisEvent);
 								}
 							}
@@ -95,7 +95,7 @@ public class FriendList extends AppCompatActivity {
 
 							// insert Friend name into top level expandableList
 							Friend insert = friends.get(loc);
-							headerList.add(insert.GetName());
+							headerList.add(insert.name);
 
 
 							// create the sublist for the above added Friend
@@ -105,7 +105,7 @@ public class FriendList extends AppCompatActivity {
 								subList.add("~Click to add an Event~");
 							} else {
 								for (int j = 0; j < friendsEvents.get(loc).size(); j++) {
-									subList.add(friendsEvents.get(loc).get(j).GetName());
+									subList.add(friendsEvents.get(loc).get(j).name);
 								}
 								subList.add("~Click to add an Event~");
 							}
@@ -142,7 +142,7 @@ public class FriendList extends AppCompatActivity {
 				if (childPosition == myAdapter.getChildrenCount(groupPosition) - 1)
 					addEvent(friends.get(groupPosition));
 				else {
-					List<String> events = eventList.get(friends.get(groupPosition).GetName());
+					List<String> events = eventList.get(friends.get(groupPosition).name);
 					openIdeaPage(events.get(childPosition).toString());//Need to replace with the actual Event class
 				}
 
@@ -181,8 +181,8 @@ public class FriendList extends AppCompatActivity {
 
 	private void addEvent(Friend currentFriend) {
 		Intent eventIntent = new Intent(ctx, EventCreation.class);
-		eventIntent.putExtra("ELID", currentFriend.GetEventListID());
-		eventIntent.putExtra("FID", currentFriend.GetFriendID());
+		eventIntent.putExtra("ELID", currentFriend.eventListID);
+		eventIntent.putExtra("FID", currentFriend.friendID);
 		finish();
 		startActivity(eventIntent);
 	}
