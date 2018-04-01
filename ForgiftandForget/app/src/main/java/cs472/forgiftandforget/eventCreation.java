@@ -10,14 +10,14 @@ import android.widget.EditText;
 import cs472.forgiftandforget.DatabaseClasses.database;
 import cs472.forgiftandforget.DatabaseClasses.event;
 
-public class eventCreation extends AppCompatActivity
+public class EventCreation extends AppCompatActivity
 {
     EditText eventField;
     EditText dateField;
     EditText timeField;
-    database db;
+    database database;
     int ret;
-    private String ELID;
+    private String EventListID;
     private String FID;
 
     @Override
@@ -29,9 +29,9 @@ public class eventCreation extends AppCompatActivity
         eventField = (EditText) findViewById(R.id.event);
         dateField = (EditText) findViewById(R.id.date);
         timeField = (EditText) findViewById(R.id.time);
-        db = new database();
+        database = new database();
 
-        ELID = getIntent().getStringExtra("ELID");
+        EventListID = getIntent().getStringExtra("EventListID");
         FID = getIntent().getStringExtra("FID");
     }
 
@@ -39,8 +39,8 @@ public class eventCreation extends AppCompatActivity
     {
         event newEvent = new event(eventField.getText().toString(),dateField.getText().toString());
 
-        ret = db.addEvent(ELID,FID,newEvent);
-        Intent intent = new Intent(eventCreation.this, friendList.class);
+        ret = database.addEvent(EventListID,FID,newEvent);
+        Intent intent = new Intent(EventCreation.this, FriendList.class);
         finish();
         startActivity(intent);
     }
@@ -50,7 +50,7 @@ public class eventCreation extends AppCompatActivity
     {
         if(keyCode == KeyEvent.KEYCODE_BACK)
         {
-            Intent intent = new Intent(eventCreation.this, friendList.class);
+            Intent intent = new Intent(EventCreation.this, FriendList.class);
             finish();
             startActivity(intent);
         }

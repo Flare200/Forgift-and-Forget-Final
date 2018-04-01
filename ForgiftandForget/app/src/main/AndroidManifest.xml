@@ -14,20 +14,20 @@
         android:roundIcon="@mipmap/ic_launcher"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
+        <activity android:name=".LoginPage">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".accountCreation" />
-        <activity android:name=".friendList" />
-        <activity android:name=".ideaPage" />
-        <activity android:name=".giftedList" />
-        <activity android:name=".friendCreation" />
-        <activity android:name=".GiftIdeas" />
-        <activity android:name=".eventCreation"></activity>
+        <activity android:name=".AccountCreation" />
+        <activity android:name=".FriendList" />
+        <activity android:name=".GiftIdeaList" />
+        <activity android:name=".GiftedList" />
+        <activity android:name=".FriendCreation" />
+        <activity android:name=".GiftIdea" />
+        <activity android:name=".EventCreation"></activity>
     </application>
 
 </manifest>

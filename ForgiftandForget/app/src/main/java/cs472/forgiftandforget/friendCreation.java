@@ -16,10 +16,10 @@ import android.widget.ImageView;
 import android.widget.Toast;
 import java.io.FileNotFoundException;
 
-public class friendCreation extends AppCompatActivity implements View.OnClickListener
+public class FriendCreation extends AppCompatActivity implements View.OnClickListener
 {
     EditText nameField;
-    database db;
+    database database;
     ImageView friendImage;
     static final int GALLERY = 1;
     Uri uri;
@@ -32,7 +32,7 @@ public class friendCreation extends AppCompatActivity implements View.OnClickLis
         setContentView(R.layout.activity_friend_creation);
         friendImage = (ImageView) findViewById(R.id.contactImage);
         nameField = (EditText) findViewById(R.id.nameField);
-        db = new database();
+        database = new database();
         friendImage.setOnClickListener(this);
     }
 
@@ -40,13 +40,13 @@ public class friendCreation extends AppCompatActivity implements View.OnClickLis
     {
         final String newName = nameField.getText().toString().trim();
         friend newFriend = new friend(newName);
-        ret = db.addFriend(newFriend, uri);
+        ret = database.addFriend(newFriend, uri);
         if (ret != 0) {
             Toast.makeText(getApplicationContext(), "Could not add Friend", Toast.LENGTH_LONG).show();
         } else {
             Toast.makeText(getApplicationContext(), newName + " Added to Friend's List", Toast.LENGTH_LONG).show();
         }
-        Intent intent = new Intent(friendCreation.this, friendList.class);
+        Intent intent = new Intent(FriendCreation.this, FriendList.class);
         finish();
         startActivity(intent);
     }
@@ -57,7 +57,7 @@ public class friendCreation extends AppCompatActivity implements View.OnClickLis
     {
         if(keyCode == KeyEvent.KEYCODE_BACK)
         {
-            Intent intent = new Intent(friendCreation.this, friendList.class);
+            Intent intent = new Intent(FriendCreation.this, FriendList.class);
             finish();
             startActivity(intent);
         }

@@ -15,10 +15,9 @@ import android.widget.Toast;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
-import com.google.firebase.auth.FirebaseUser;
 
 
-public class accountCreation extends AppCompatActivity implements View.OnClickListener{
+public class AccountCreation extends AppCompatActivity implements View.OnClickListener{
 
     static final int PASSWORD_MIN_LENGTH = 6;
     ProgressBar progressBar;
@@ -76,12 +75,12 @@ public class accountCreation extends AppCompatActivity implements View.OnClickLi
                     FirebaseAuth.getInstance().signOut();
                     finish();
                     Toast.makeText(getApplicationContext(), "Thank you for registering. Please Sign in", Toast.LENGTH_LONG).show();
-                    startActivity(new Intent(accountCreation.this, MainActivity.class));
+                    startActivity(new Intent(AccountCreation.this, LoginPage.class));
                 } else {
 
                     if (task.getException() instanceof FirebaseAuthUserCollisionException) {
                         Toast.makeText(getApplicationContext(), "You are already registered. Please Sign in", Toast.LENGTH_LONG).show();
-                        startActivity(new Intent(accountCreation.this, MainActivity.class));
+                        startActivity(new Intent(AccountCreation.this, LoginPage.class));
 
                     } else {
                         //ToDo: add in additional error handling via task.getException()
@@ -103,7 +102,7 @@ public class accountCreation extends AppCompatActivity implements View.OnClickLi
 
             case R.id.buttonAlreadyRegistered:
                 finish();
-                startActivity(new Intent(accountCreation.this, MainActivity.class));
+                startActivity(new Intent(AccountCreation.this, LoginPage.class));
                 break;
         }
     }

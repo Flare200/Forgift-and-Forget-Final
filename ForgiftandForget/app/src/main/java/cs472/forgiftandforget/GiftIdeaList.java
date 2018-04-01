@@ -5,13 +5,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.KeyEvent;
 
-public class ideaPage extends AppCompatActivity
+public class GiftIdeaList extends AppCompatActivity
 {
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_idea_page);
+        setContentView(R.layout.activity_gift_idea_list);
         setTitle(getIntent().getStringExtra("event"));
     }
 
@@ -20,7 +20,7 @@ public class ideaPage extends AppCompatActivity
     {
         if(keyCode == KeyEvent.KEYCODE_BACK)
         {
-            Intent intent = new Intent(ideaPage.this, friendList.class);
+            Intent intent = new Intent(GiftIdeaList.this, FriendList.class);
             finish();
             startActivity(intent);
         }

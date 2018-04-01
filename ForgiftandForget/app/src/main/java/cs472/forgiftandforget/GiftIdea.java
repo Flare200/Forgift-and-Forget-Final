@@ -14,7 +14,7 @@ import android.widget.ImageView;
 
 import java.io.FileNotFoundException;
 
-public class GiftIdeas extends AppCompatActivity {
+public class GiftIdea extends AppCompatActivity {
 
     ImageView photo[] = new ImageView[3];
     Button photoButton;
@@ -25,7 +25,7 @@ public class GiftIdeas extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_gift_ideas);
+        setContentView(R.layout.activity_gift_idea);
 
         photoButton = (Button)findViewById(R.id.giftPhotoButtonGallery);
         photo[0] = (ImageView)findViewById(R.id.giftPhoto1);

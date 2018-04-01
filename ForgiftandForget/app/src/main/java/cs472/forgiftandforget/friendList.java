@@ -27,11 +27,11 @@ import cs472.forgiftandforget.DatabaseClasses.database;
 import cs472.forgiftandforget.DatabaseClasses.event;
 import cs472.forgiftandforget.DatabaseClasses.friend;
 
-public class friendList extends AppCompatActivity
+public class FriendList extends AppCompatActivity
 {
     private Context ctx = this;
     private ExpandableListView friendList;
-    private friendsListAdapter myAdapter;
+    private FriendsListAdapter myAdapter;
 
     FirebaseAuth mAuth;
     database db;
@@ -125,7 +125,7 @@ public class friendList extends AppCompatActivity
                             // if all friends+events have been loaded, display expandableList
                             if(loc == friends.size()-1)
                             {
-                                myAdapter = new friendsListAdapter(ctx,headerList,eventList);
+                                myAdapter = new FriendsListAdapter(ctx,headerList,eventList);
                                 friendList.setAdapter(myAdapter);
                             }
 
@@ -192,14 +192,14 @@ public class friendList extends AppCompatActivity
 
     private void addFriend()
     {
-        Intent friendIntent = new Intent(ctx,friendCreation.class);
+        Intent friendIntent = new Intent(ctx,FriendCreation.class);
         finish();
         startActivity(friendIntent);
     }
 
     private void addEvent(friend currentFriend)
     {
-        Intent eventIntent = new Intent(ctx,eventCreation.class);
+        Intent eventIntent = new Intent(ctx,EventCreation.class);
         eventIntent.putExtra("ELID",currentFriend.getEventListID());
         eventIntent.putExtra("FID",currentFriend.getFriendID());
         finish();
@@ -208,7 +208,7 @@ public class friendList extends AppCompatActivity
 
     private void openIdeaPage(String eventName)
     {
-        Intent ideaIntent = new Intent(ctx,ideaPage.class);
+        Intent ideaIntent = new Intent(ctx,GiftIdeaList.class);
         ideaIntent.putExtra("event",eventName);
         finish();
         startActivity(ideaIntent);
@@ -218,7 +218,7 @@ public class friendList extends AppCompatActivity
     {
         FirebaseAuth.getInstance().signOut();
         finish();
-        Intent intent = new Intent(ctx, MainActivity.class);
+        Intent intent = new Intent(ctx, LoginPage.class);
         startActivity(intent);
     }
 }
