@@ -1,5 +1,6 @@
 package cs472.forgiftandforget;
 
+import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -14,13 +15,15 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthUserCollisionException;
+import com.google.firebase.auth.FirebaseUser;
 
-public class LoginPage extends AppCompatActivity implements View.OnClickListener
+public class MainActivity extends AppCompatActivity implements View.OnClickListener
 {
     static final int PASSWORD_MIN_LENGTH = 6;
     static final String INVALID_PASSWORD = "The password is invalid or the user does not have a password.";
     static final String INVALID_EMAIL = "There is no user record corresponding to this identifier. The user may have been deleted.";
-    FirebaseAuth mAuthentication;
+    FirebaseAuth mAuth;
     EditText emailField;
     EditText passwordField;
     ProgressBar progressBar;
@@ -29,9 +32,9 @@ public class LoginPage extends AppCompatActivity implements View.OnClickListener
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login_page);
+        setContentView(R.layout.activity_main);
 
-        mAuthentication = FirebaseAuth.getInstance();
+        mAuth = FirebaseAuth.getInstance();
 
         progressBar = (ProgressBar) findViewById(R.id.progress);
         emailField = (EditText) findViewById(R.id.emailField);
@@ -51,37 +54,34 @@ public class LoginPage extends AppCompatActivity implements View.OnClickListener
         {
             case R.id.newUserButton:
                 finish();
-                startActivity(new Intent(LoginPage.this, AccountCreation.class));
+                startActivity(new Intent(MainActivity.this, accountCreation.class));
                 break;
 
             case R.id.loginButton:
-                LoginClicked();
+                loginClicked();
                 break;
         }
     }
 
-    private void LoginClicked()
+    private void loginClicked()
     {
         String email = emailField.getText().toString().trim();
         String password = passwordField.getText().toString().trim();
 
         //Validate email
-        if(email.isEmpty() || !Patterns.EMAIL_ADDRESS.matcher(email).matches())
-        {
+        if(email.isEmpty() || !Patterns.EMAIL_ADDRESS.matcher(email).matches()){
             emailField.setError("Invalid Email");
             emailField.requestFocus();
             return;
         }
 
         //Validate password
-        if(password.isEmpty())
-        {
+        if(password.isEmpty()){
             passwordField.setError("Password Required");
             passwordField.requestFocus();
             return;
         }
-        if(password.length() < PASSWORD_MIN_LENGTH)
-        {
+        if(password.length() < PASSWORD_MIN_LENGTH){
             passwordField.setError("Password must exceed 6 characters");
             passwordField.requestFocus();
             return;
@@ -90,13 +90,13 @@ public class LoginPage extends AppCompatActivity implements View.OnClickListener
 
         //Validations complete, initiate sign in
         progressBar.setVisibility(View.VISIBLE);
-        mAuthentication.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+        mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 progressBar.setVisibility(View.GONE);
                 if (task.isSuccessful()) {
                     finish();
-                    Intent intent = new Intent(LoginPage.this, FriendList.class);
+                    Intent intent = new Intent(MainActivity.this, friendList.class);
                     startActivity(intent);
                 } else {
                     String error = task.getException().getMessage().toString();
@@ -126,10 +126,10 @@ public class LoginPage extends AppCompatActivity implements View.OnClickListener
         super.onStart();
 
         // check if user is logged in already
-        if (mAuthentication.getCurrentUser() != null)
+        if (mAuth.getCurrentUser() != null)
         {
             finish();
-            Intent intent = new Intent(LoginPage.this, FriendList.class);
+            Intent intent = new Intent(MainActivity.this, friendList.class);
             startActivity(intent);
         }
 

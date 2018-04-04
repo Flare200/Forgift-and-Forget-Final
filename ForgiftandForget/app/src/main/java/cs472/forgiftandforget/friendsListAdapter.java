@@ -15,13 +15,13 @@ import java.util.List;
  * Created by Aaron on 2/15/2018.
  */
 
-public class FriendsListAdapter extends BaseExpandableListAdapter
+public class friendsListAdapter extends BaseExpandableListAdapter
 {
     private List<String> headerList;
     private HashMap<String,List<String>> ideasList;
     private Context ctx;
 
-    FriendsListAdapter(Context ctx, List<String> headerList, HashMap<String,List<String>> ideasList)
+    friendsListAdapter(Context ctx, List<String> headerList, HashMap<String,List<String>> ideasList)
     {
         this.ctx = ctx;
         this.ideasList = ideasList;
