@@ -13,13 +13,13 @@ import android.support.annotation.NonNull;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FirebaseAuth;
+
+import cs472.forgiftandforget.DatabaseClasses.Database;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 	static final int PASSWORD_MIN_LENGTH = 6;
 	static final String INVALID_PASSWORD = "The password is invalid or the user does not have a password.";
 	static final String INVALID_EMAIL = "There is no user record corresponding to this identifier. The user may have been deleted.";
-	FirebaseAuth mAuth;
 	EditText emailField;
 	EditText passwordField;
 	ProgressBar progressBar;
@@ -29,7 +29,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		mAuth = FirebaseAuth.getInstance();
 
 		progressBar = (ProgressBar) findViewById(R.id.progress);
 		emailField = (EditText) findViewById(R.id.emailField);
@@ -81,7 +80,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 		//Validations complete, initiate sign in
 		progressBar.setVisibility(View.VISIBLE);
-		mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+		Database.GetInstance().signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
 			@Override
 			public void onComplete(@NonNull Task<AuthResult> task) {
 				progressBar.setVisibility(View.GONE);
@@ -116,7 +115,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 		super.onStart();
 
 		// check if user is logged in already
-		if (mAuth.getCurrentUser() != null) {
+		if (Database.GetInstance().getCurrentUser() != null) {
 			finish();
 			Intent intent = new Intent(MainActivity.this, FriendList.class);
 			startActivity(intent);

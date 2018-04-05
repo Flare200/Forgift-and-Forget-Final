@@ -70,9 +70,9 @@ public class Gift {
 	}
 
 	@Exclude
-	public static void RemoveGift(String GID) {
+	public static void RemoveGift(String giftID) {
 		// need a separate new reference for each call, as it is called in a loop from RemoveEvent
-		final DatabaseReference giftRef = GetGiftsReference().child(GID);
+		final DatabaseReference giftRef = GetGiftsReference().child(giftID);
 		giftRef.addListenerForSingleValueEvent(new ValueEventListener() {
 			@Override
 			public void onDataChange(DataSnapshot dataSnapshot) {

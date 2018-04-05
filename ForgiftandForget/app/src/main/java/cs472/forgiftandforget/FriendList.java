@@ -14,8 +14,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.*;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -33,12 +31,10 @@ public class FriendList extends AppCompatActivity {
 	private ExpandableListView friendList;
 	private FriendsListAdapter myAdapter;
 
-	FirebaseAuth mAuth;
-	Database db;
+	Database database;
 	CopyOnWriteArrayList<Friend> friends = new CopyOnWriteArrayList<>(); //this is accessed by multiple threads.
 	CopyOnWriteArrayList<ArrayList<Event>> friendsEvents = new CopyOnWriteArrayList<>();
-	DatabaseReference ref;
-	FirebaseUser currentUser;
+	DatabaseReference friendsListReference;
 	//StorageReference storageRef;
 
 
@@ -49,18 +45,15 @@ public class FriendList extends AppCompatActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_friend_list);
 
-		mAuth = FirebaseAuth.getInstance();
-		currentUser = mAuth.getCurrentUser();
-		String uid = currentUser.getUid();
-		ref = FirebaseDatabase.getInstance().getReference("FriendsLists").child(uid);
-		db = new Database();
+		database = new Database();
+		friendsListReference = Friend.GetFriendsListsReference().child(Database.GetCurrentUID());
 		friendList = (ExpandableListView) findViewById(R.id.listView);
 		//storageRef  = FirebaseStorage.getInstance().getReference().child("contactImages");
 		final List<String> headerList = new ArrayList<String>();
 		final HashMap<String, List<String>> eventList = new HashMap<String, List<String>>();
 
 		// single Event, on create, to populate a list of friends(myList)
-		ref.addListenerForSingleValueEvent(new ValueEventListener() {
+		friendsListReference.addListenerForSingleValueEvent(new ValueEventListener() {
 			@Override
 			public void onDataChange(DataSnapshot dataSnapshot) {
 				Iterable<DataSnapshot> children = dataSnapshot.getChildren();
@@ -86,7 +79,7 @@ public class FriendList extends AppCompatActivity {
 							// Except for the null Event which is added on Friend creation(to hold Database spot)
 							for (DataSnapshot Child : Children) {
 								Event thisEvent = Child.getValue(Event.class);
-								if (thisEvent.eventID != null && thisEvent.eventID != "null") {
+								if (thisEvent != null && !thisEvent.eventID.equals("null")) {
 									events.add(thisEvent);
 								}
 							}
@@ -142,8 +135,8 @@ public class FriendList extends AppCompatActivity {
 				if (childPosition == myAdapter.getChildrenCount(groupPosition) - 1)
 					addEvent(friends.get(groupPosition));
 				else {
-					List<String> events = eventList.get(friends.get(groupPosition).name);
-					openIdeaPage(events.get(childPosition).toString());//Need to replace with the actual Event class
+					// send eventID to IdeaPage
+					openIdeaPage(friendsEvents.get(groupPosition).get(childPosition).eventID);
 				}
 
 				return false;
@@ -187,15 +180,15 @@ public class FriendList extends AppCompatActivity {
 		startActivity(eventIntent);
 	}
 
-	private void openIdeaPage(String eventName) {
+	private void openIdeaPage(String eventID) {
 		Intent ideaIntent = new Intent(ctx, IdeaPage.class);
-		ideaIntent.putExtra("Event", eventName);
+		ideaIntent.putExtra("eventID", eventID);
 		finish();
 		startActivity(ideaIntent);
 	}
 
 	private void userLogOut() {
-		FirebaseAuth.getInstance().signOut();
+		Database.GetInstance().signOut();
 		finish();
 		Intent intent = new Intent(ctx, MainActivity.class);
 		startActivity(intent);

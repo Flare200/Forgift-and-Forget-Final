@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import cs472.forgiftandforget.DatabaseClasses.Event;
 
@@ -13,9 +14,8 @@ public class EventCreation extends AppCompatActivity {
 	EditText eventField;
 	EditText dateField;
 	EditText timeField;
-	int ret;
-	private String ELID;
-	private String FID;
+	private String eventListID;
+	private String friendID;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -26,13 +26,18 @@ public class EventCreation extends AppCompatActivity {
 		dateField = (EditText) findViewById(R.id.date);
 		timeField = (EditText) findViewById(R.id.time);
 
-		ELID = getIntent().getStringExtra("ELID");
-		FID = getIntent().getStringExtra("FID");
+		eventListID = getIntent().getStringExtra("ELID");
+		friendID = getIntent().getStringExtra("FID");
 	}
 
 	public void addNewEvent(View view) {
 		Event newEvent = new Event(eventField.getText().toString(), dateField.getText().toString());
-		ret = Event.AddEvent(ELID, FID, newEvent);
+		if(Event.AddEvent(eventListID, friendID, newEvent) == 0){
+			Toast.makeText(getApplicationContext(), newEvent.name +" Added to events", Toast.LENGTH_LONG).show();
+		}else{
+			// error adding event
+			Toast.makeText(getApplicationContext(), "Unable to add Event. Please try again", Toast.LENGTH_LONG).show();
+		}
 		Intent intent = new Intent(EventCreation.this, FriendList.class);
 		finish();
 		startActivity(intent);

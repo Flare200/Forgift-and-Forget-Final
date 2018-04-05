@@ -40,19 +40,33 @@ public class Friend {
 	}
 
 	@Exclude
-	public static void RemoveFriend(String FID) {
+	public static void RemoveFriend(String friendID) {
 
-		final DatabaseReference friendsListRef = GetFriendsListsReference().child(Database.GetCurrentUID()).child(FID);
+		final DatabaseReference friendsListRef = GetFriendsListsReference().child(Database.GetCurrentUID()).child(friendID);
 		friendsListRef.addListenerForSingleValueEvent(new ValueEventListener() {
 			@Override
 			public void onDataChange(DataSnapshot dataSnapshot) {
-				String ELID;
+				String eventListID;
 				String imageID;
-				ELID = dataSnapshot.child("eventListID").getValue().toString();
-				imageID = dataSnapshot.child("imageID").getValue().toString();
+				java.lang.Object temp;
+				temp = dataSnapshot.child("eventListID").getValue();
+				if(temp != null){
+					eventListID = temp.toString();
+					Event.RemoveEventList(eventListID);
+				}
+				else{
+					// no friend to remove
+					return;
+				}
+				temp = dataSnapshot.child("imageID").getValue();
+				if(temp != null){
+					imageID = temp.toString();
+					// ToDo remove image from database
+				}
+
+
 				friendsListRef.removeValue();
-				Event.RemoveEventList(ELID);
-				// something to remove image possibly
+
 			}
 
 			@Override
@@ -64,36 +78,36 @@ public class Friend {
 
 	@Exclude
 	//accepts a friend object, to add to the current users friends list
-	public static int AddFriend(Friend newFriend, final Uri uri) {
+	public static int AddFriend(Friend newFriend, final Uri contactImageUri) {
 
 		//get database reference to the node of the logged in UID
 		DatabaseReference friendsListsRef = GetFriendsListsReference().child(Database.GetCurrentUID());
-		final Event blankEvent = new Event("blank", "blank");
+		final Event blankEvent = new Event("null", "null");
 
 		// get references to images and event list nodes
 		final DatabaseReference eventListRef = Event.GetEventListsReference();
 		//storageRef = FirebaseStorage.getInstance().getReference().child("contactImages");
 
 		//push new unique new keys, load into newFriend object
-		final String FID = friendsListsRef.push().getKey();
-		final String ELID = eventListRef.push().getKey();
+		final String friendID = friendsListsRef.push().getKey();
+		final String eventListID = eventListRef.push().getKey();
 		final String imageID = friendsListsRef.push().getKey();
 
-		newFriend.eventListID = ELID;
-		newFriend.friendID = FID;
+		newFriend.eventListID = eventListID;
+		newFriend.friendID = friendID;
 		newFriend.imageID = imageID;
 
 		//add newFriend to users friends list inside database
-		friendsListsRef.child(FID).setValue(newFriend, new DatabaseReference.CompletionListener() {
+		friendsListsRef.child(friendID).setValue(newFriend, new DatabaseReference.CompletionListener() {
 			@Override
 			public void onComplete(DatabaseError error, DatabaseReference ref) {
 				if (error != null) {
 					Database.errorCode = 1;
 				} else {
 					// completed successfully
-					eventListRef.child(ELID).child("blankEvent").setValue(blankEvent);
-		            /*if (uri != null) {
-                        storageRef.child(imageID).putFile(uri);
+					eventListRef.child(eventListID).child("blankEvent").setValue(blankEvent);
+		            /*if (contactImageUri != null) {
+                        storageRef.child(imageID).putFile(contactImageUri);
                     }*/
 					Database.errorCode = 0;
 				}

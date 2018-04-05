@@ -15,8 +15,9 @@ import android.support.annotation.NonNull;
 import android.widget.Toast;
 
 import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
+
+import cs472.forgiftandforget.DatabaseClasses.Database;
 
 
 public class AccountCreation extends AppCompatActivity implements View.OnClickListener {
@@ -26,8 +27,6 @@ public class AccountCreation extends AppCompatActivity implements View.OnClickLi
 	EditText emailField;
 	EditText passwordField;
 
-	private FirebaseAuth mAuth;
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -36,8 +35,6 @@ public class AccountCreation extends AppCompatActivity implements View.OnClickLi
 		progressBar = (ProgressBar) findViewById(R.id.progress);
 		emailField = (EditText) findViewById(R.id.emailField);
 		passwordField = (EditText) findViewById(R.id.passwordField);
-
-		mAuth = FirebaseAuth.getInstance();
 
 		findViewById(R.id.buttonRegister).setOnClickListener(this);
 		findViewById(R.id.buttonAlreadyRegistered).setOnClickListener(this);
@@ -68,13 +65,12 @@ public class AccountCreation extends AppCompatActivity implements View.OnClickLi
 
 		//Validations complete, initiate registration
 		progressBar.setVisibility(View.VISIBLE);
-		mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+		Database.GetInstance().createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
 			@Override
 			public void onComplete(@NonNull Task<AuthResult> task) {
 				progressBar.setVisibility(View.GONE);
 				if (task.isSuccessful()) {
-
-					FirebaseAuth.getInstance().signOut();
+					Database.GetInstance().signOut();
 					finish();
 					Toast.makeText(getApplicationContext(), "Thank you for registering. Please Sign in", Toast.LENGTH_LONG).show();
 					startActivity(new Intent(AccountCreation.this, MainActivity.class));

@@ -33,8 +33,8 @@ public class Event {
 	}
 
 	@Exclude
-	public static void RemoveEvent(String EID) {
-		final DatabaseReference giftListsRef = Gift.GetGiftListsReference().child(EID);
+	public static void RemoveEvent(String eventID) {
+		final DatabaseReference giftListsRef = Gift.GetGiftListsReference().child(eventID);
 
 		// need a separate new reference for each call, as it is called in a loop from RemoveEventList
 		giftListsRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -79,15 +79,17 @@ public class Event {
 
 	// accepts the Event list id, and an Event object to add to the corresponding Event list
 	@Exclude
-	public static int AddEvent(String ELID, String FID, Event newEvent) {
+	public static int AddEvent(String eventListID, String friendID, Event newEvent) {
 		//get reference to specific Event list
-		final DatabaseReference eventListRef = GetEventListsReference().child(ELID);
-		final DatabaseReference friendsListsRef = Friend.GetFriendsListsReference().child(Database.GetCurrentUID()).child(FID);
-		final String EID = friendsListsRef.push().getKey();
-		newEvent.eventID = EID;
+		final DatabaseReference eventListRef = GetEventListsReference().child(eventListID);
+		final DatabaseReference friendsListsRef = Friend.GetFriendsListsReference().child(Database.GetCurrentUID()).child(friendID);
+		final DatabaseReference giftListReference = Gift.GetGiftListsReference();
+		final String eventID = friendsListsRef.push().getKey();
+		final Gift blankGift = new Gift("null");
+		newEvent.eventID = eventID;
 
 		//add new value
-		eventListRef.child(EID).setValue(newEvent, new DatabaseReference.CompletionListener() {
+		eventListRef.child(eventID).setValue(newEvent, new DatabaseReference.CompletionListener() {
 			@Override
 			public void onComplete(DatabaseError error, DatabaseReference databaseReference) {
 				if (error != null) {
@@ -96,6 +98,7 @@ public class Event {
 				} else {
 					//success
 					friendsListsRef.child("hasEvents").setValue(true);
+					giftListReference.child(eventID).child("blankGift").setValue(blankGift);
 					Database.errorCode = 0;
 				}
 			}
