@@ -23,7 +23,7 @@ public class IdeaPage extends AppCompatActivity {
 
 	DatabaseReference giftListReference;
 	CopyOnWriteArrayList<Gift> gifts = new CopyOnWriteArrayList<>();
-
+	CopyOnWriteArrayList<String> giftIDS = new CopyOnWriteArrayList<>();
 
 
 	@Override
@@ -35,20 +35,43 @@ public class IdeaPage extends AppCompatActivity {
 
 
 
+
 		giftListReference.addListenerForSingleValueEvent(new ValueEventListener() {
 			@Override
 			public void onDataChange(DataSnapshot dataSnapshot) {
 				Iterable<DataSnapshot> children = dataSnapshot.getChildren();
 
 				// for each entry in gift list, add to gifts, except for blank gift
-				for (DataSnapshot child : children) {
-					Gift newGift = child.getValue(Gift.class);
-					if(newGift != null && !newGift.name.equals("null")) {
-						gifts.add(newGift);
-					}
+				for (DataSnapshot Child : children) {
+					String giftID = Child.getKey();
+					giftIDS.add(giftID);
 				}
 
-				// list of Gifts gifts usable here.
+				for (int i = 0; i < giftIDS.size(); i++) {
+					final int loc = i;
+					DatabaseReference giftReference = Gift.GetGiftsReference();
+					giftReference.addListenerForSingleValueEvent(new ValueEventListener() {
+						@Override
+						public void onDataChange(DataSnapshot dataSnapshot) {
+							Gift newGift = new Gift();
+							newGift.name = dataSnapshot.child(giftIDS.get(loc)).child("name").getValue(String.class);
+							newGift.description = dataSnapshot.child(giftIDS.get(loc)).child("description").getValue(String.class);
+							newGift.url = dataSnapshot.child(giftIDS.get(loc)).child("url").getValue(String.class);
+							newGift.imageID = dataSnapshot.child(giftIDS.get(loc)).child("imageID").getValue(String.class);
+							gifts.add(newGift);
+
+
+							if(loc == giftIDS.size()-1){
+								// list of gifts available here
+							}
+						}
+
+						@Override
+						public void onCancelled(DatabaseError databaseError) {
+
+						}
+					});
+				}
 			}
 
 			@Override

@@ -98,7 +98,7 @@ public class Event {
 				} else {
 					//success
 					friendsListsRef.child("hasEvents").setValue(true);
-					giftListReference.child(eventID).child("blankGift").setValue(blankGift);
+					giftListReference.child(eventID).setValue(".");
 					Database.errorCode = 0;
 				}
 			}
