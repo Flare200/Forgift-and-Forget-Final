@@ -79,7 +79,7 @@ public class EventCreation extends AppCompatActivity {
 			@Override
 			public void onFocusChange(View v, boolean hasFocus) {
 				if (hasFocus) {
-					showDialog(TIME_PICK;
+					showDialog(TIME_PICK);
 				}
 			}
 		});
