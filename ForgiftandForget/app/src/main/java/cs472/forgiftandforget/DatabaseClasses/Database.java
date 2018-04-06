@@ -17,24 +17,15 @@ public class Database extends AppCompatActivity {
 	public static int errorCode;       // return value, 0 success, non zero specific error codes
 
 	public static FirebaseAuth GetInstance() {
-		if (firebaseAuthInstance == null) {
-			firebaseAuthInstance = FirebaseAuth.getInstance();
-		}
-		return firebaseAuthInstance;
+		return FirebaseAuth.getInstance();
 	}
 
 	public static FirebaseUser GetCurrentUser() {
-		if (currentUser == null) {
-			currentUser = GetInstance().getCurrentUser();
-		}
-		return currentUser;
+		return GetInstance().getCurrentUser();
 	}
 
 	public static String GetCurrentUID() {
-		if (currentUID == null) {
-			currentUID = GetCurrentUser().getUid();
-		}
-		return currentUID;
+		return GetCurrentUser().getUid();
 	}
 
 }
