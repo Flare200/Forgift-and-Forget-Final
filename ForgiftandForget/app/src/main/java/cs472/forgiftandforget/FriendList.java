@@ -7,7 +7,9 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ExpandableListView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,6 +23,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 //import com.google.firebase.storage.FirebaseStorage;
 //import com.google.firebase.storage.StorageReference;
+import static java.lang.Math.toIntExact;
 
 import cs472.forgiftandforget.DatabaseClasses.Database;
 import cs472.forgiftandforget.DatabaseClasses.Event;
@@ -47,7 +50,50 @@ public class FriendList extends AppCompatActivity {
 
 		database = new Database();
 		friendsListReference = Friend.GetFriendsListsReference().child(Database.GetCurrentUID());
+
 		friendList = (ExpandableListView) findViewById(R.id.listView);
+		friendList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+			@Override
+			public boolean onItemLongClick(AdapterView<?> parent, View view, int totalPosition, long position) {
+
+				ExpandableListView.getPackedPositionType(position);
+
+				int type = ExpandableListView.getPackedPositionType(position);
+
+
+				int friendPosition = ExpandableListView.getPackedPositionGroup(position);
+				int eventPosition = ExpandableListView.getPackedPositionChild(position);
+
+
+				switch (type) {
+					case ExpandableListView.PACKED_POSITION_TYPE_GROUP: {
+						//if friend long clicked
+
+						// ToDo send to edit friend
+						Intent friendEditIntent = new Intent(ctx, FriendCreation.class);
+						// set option so the activity knows this is an edit, instead of create
+						friendEditIntent.putExtra("option", 1);
+						// send friendID to edit
+						friendEditIntent.putExtra("friendID", friends.get(friendPosition).friendID);
+						finish();
+						startActivity(friendEditIntent);
+
+
+
+						return true;
+					}
+					case ExpandableListView.PACKED_POSITION_TYPE_CHILD: {
+						// if event item clicked
+						// ToDo have an edit event option maybe? will need to verify they didnt click ~add event~
+
+
+						return true;
+					}
+				}
+				return false;
+			}
+
+		});
 		//storageRef  = FirebaseStorage.getInstance().getReference().child("contactImages");
 		final List<String> headerList = new ArrayList<String>();
 		final HashMap<String, List<String>> eventList = new HashMap<String, List<String>>();
@@ -79,7 +125,7 @@ public class FriendList extends AppCompatActivity {
 							// Except for the null Event which is added on Friend creation(to hold Database spot)
 							for (DataSnapshot Child : Children) {
 								Event thisEvent = Child.getValue(Event.class);
-								if (thisEvent != null && !thisEvent.eventID.equals("null")) {
+								if (thisEvent != null) {
 									events.add(thisEvent);
 								}
 							}
@@ -168,6 +214,8 @@ public class FriendList extends AppCompatActivity {
 
 	private void addFriend() {
 		Intent friendIntent = new Intent(ctx, FriendCreation.class);
+		// send option so activity knows this is an add, and not edit
+		friendIntent.putExtra("option", 0);
 		finish();
 		startActivity(friendIntent);
 	}
@@ -193,4 +241,6 @@ public class FriendList extends AppCompatActivity {
 		Intent intent = new Intent(ctx, MainActivity.class);
 		startActivity(intent);
 	}
+
+
 }

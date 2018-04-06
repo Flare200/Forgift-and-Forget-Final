@@ -82,7 +82,6 @@ public class Friend {
 
 		//get database reference to the node of the logged in UID
 		DatabaseReference friendsListsRef = GetFriendsListsReference().child(Database.GetCurrentUID());
-		final Event blankEvent = new Event("null", "null");
 
 		// get references to images and event list nodes
 		final DatabaseReference eventListRef = Event.GetEventListsReference();
@@ -105,7 +104,7 @@ public class Friend {
 					Database.errorCode = 1;
 				} else {
 					// completed successfully
-					eventListRef.child(eventListID).child("blankEvent").setValue(blankEvent);
+					eventListRef.child(eventListID).setValue(".");
 		            /*if (contactImageUri != null) {
                         storageRef.child(imageID).putFile(contactImageUri);
                     }*/
@@ -114,6 +113,26 @@ public class Friend {
 			}
 		});
 
+		return Database.errorCode;
+	}
+
+	public int updateFriend(Uri updatedContactImage){
+		DatabaseReference friendsListsRef = GetFriendsListsReference().child(Database.GetCurrentUID());
+		friendsListsRef.child(this.friendID).setValue(this, new DatabaseReference.CompletionListener() {
+			@Override
+			public void onComplete(DatabaseError error, DatabaseReference ref) {
+				if (error != null) {
+					Database.errorCode = 1;
+				} else {
+					// ToDO deal with update of contact image when storage reference is put back into project
+					// completed successfully
+		            /*if (contactImageUri != null) {
+                        storageRef.child(imageID).putFile(contactImageUri);
+                    }*/
+					Database.errorCode = 0;
+				}
+			}
+		});
 		return Database.errorCode;
 	}
 

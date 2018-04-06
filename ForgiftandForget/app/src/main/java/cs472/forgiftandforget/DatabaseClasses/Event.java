@@ -42,8 +42,12 @@ public class Event {
 			public void onDataChange(DataSnapshot dataSnapshot) {
 				Iterable<DataSnapshot> children = dataSnapshot.getChildren();
 				for (DataSnapshot Child : children) {
-					String GID = Child.child("gid").getValue().toString();
-					Gift.RemoveGift(GID);
+					// get each giftID in the giftList, and remove them
+					java.lang.Object temp = Child.getKey();
+					if(temp != null) {
+						String giftID = temp.toString();
+						Gift.RemoveGift(giftID);
+					}
 				}
 				giftListsRef.removeValue();
 			}
@@ -56,16 +60,20 @@ public class Event {
 	}
 
 	@Exclude
-	public static void RemoveEventList(String ELID) {
-		final DatabaseReference eventListsRef = GetEventListsReference().child(ELID);
+	public static void RemoveEventList(String eventListID) {
+		final DatabaseReference eventListsRef = GetEventListsReference().child(eventListID);
 
 		eventListsRef.addListenerForSingleValueEvent(new ValueEventListener() {
 			@Override
 			public void onDataChange(DataSnapshot dataSnapshot) {
 				Iterable<DataSnapshot> children = dataSnapshot.getChildren();
 				for (DataSnapshot Child : children) {
-					String EID = Child.child("eid").getValue().toString();
-					Event.RemoveEvent(EID);
+					java.lang.Object temp = Child.child("eventID").getValue();
+					if(temp != null) {
+						String eventID = temp.toString();
+						Event.RemoveEvent(eventID);
+					}
+
 				}
 				eventListsRef.removeValue();
 			}
