@@ -26,6 +26,10 @@ public class EventCreation extends AppCompatActivity {
 	EditText timeField;
 	private String eventListID;
 	private String friendID;
+	final static int TIME_PICK = 1;
+	final static int DATE_PICK = 0;
+	final static int MAX_HOURS = 12;
+	final static int TEN = 10;
 	int year;
 	int month;
 	int day;
@@ -54,28 +58,28 @@ public class EventCreation extends AppCompatActivity {
 		dateField.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				showDialog(0);
+				showDialog(DATE_PICK);
 			}
 		});
 		dateField.setOnFocusChangeListener(new View.OnFocusChangeListener() {
 			@Override
 			public void onFocusChange(View v, boolean hasFocus) {
 				if (hasFocus) {
-					showDialog(0);
+					showDialog(DATE_PICK);
 				}
 			}
 		});
 		timeField.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				showDialog(1);
+				showDialog(TIME_PICK);
 			}
 		});
 		timeField.setOnFocusChangeListener(new View.OnFocusChangeListener() {
 			@Override
 			public void onFocusChange(View v, boolean hasFocus) {
 				if (hasFocus) {
-					showDialog(1);
+					showDialog(TIME_PICK;
 				}
 			}
 		});
@@ -111,11 +115,11 @@ public class EventCreation extends AppCompatActivity {
 			minute = minuteOfHour;
 			String amOrPm = "am";
 			String setTime;
-			if(hour > 12){
-				hour = hour-12;
+			if(hour > MAX_HOURS){
+				hour = hour-MAX_HOURS;
 				amOrPm = "pm";
 			}
-			if(minute < 10){
+			if(minute < TEN){
 				setTime = hour + ":0" + minute + amOrPm;
 			}else {
 				setTime = hour + ":" + minute + amOrPm;
