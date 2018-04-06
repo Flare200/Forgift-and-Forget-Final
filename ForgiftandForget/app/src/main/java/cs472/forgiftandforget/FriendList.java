@@ -35,13 +35,10 @@ public class FriendList extends AppCompatActivity {
 	private FriendsListAdapter myAdapter;
 
 	Database database;
-	CopyOnWriteArrayList<Friend> friends = new CopyOnWriteArrayList<>(); //this is accessed by multiple threads.
-	CopyOnWriteArrayList<ArrayList<Event>> friendsEvents = new CopyOnWriteArrayList<>();
+	final ArrayList<Friend> friends = new ArrayList<>(); //this is accessed by multiple threads.
+	final ArrayList<ArrayList<Event>> friendsEvents = new ArrayList<>();
 	DatabaseReference friendsListReference;
-	//StorageReference storageRef;
 
-
-	static final int ADD_FRIEND_REQUEST = 1;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -103,68 +100,76 @@ public class FriendList extends AppCompatActivity {
 			@Override
 			public void onDataChange(DataSnapshot dataSnapshot) {
 				Iterable<DataSnapshot> children = dataSnapshot.getChildren();
-
 				// add each of the users friends to the list friends
-				for (DataSnapshot child : children) {
-					Friend newFriend = child.getValue(Friend.class);
-					friends.add(newFriend);
-				}
+				synchronized (friends) {
+					friends.clear();
+					for (DataSnapshot child : children) {
+						Friend newFriend = child.getValue(Friend.class);
+						friends.add(newFriend);
+					}
 
-				//for each Friend in the list get all events for the Friend, add them to ExpandableList
-				for (int i = 0; i < friends.size(); i++) {
-					final Friend thisFriend = friends.get(i);
-					final int loc = i;
-					//getting reference to specific Event list
-					DatabaseReference thisRef = FirebaseDatabase.getInstance().getReference("EventLists").child(thisFriend.eventListID);
-					thisRef.addListenerForSingleValueEvent(new ValueEventListener() {
-						@Override
-						public void onDataChange(DataSnapshot dataSnapshot) {
-							Iterable<DataSnapshot> Children = dataSnapshot.getChildren();
-							ArrayList<Event> events = new ArrayList<Event>();
-							// getting all events and adding to the list events
-							// Except for the null Event which is added on Friend creation(to hold Database spot)
-							for (DataSnapshot Child : Children) {
-								Event thisEvent = Child.getValue(Event.class);
-								if (thisEvent != null) {
-									events.add(thisEvent);
+
+					//for each Friend in the list get all events for the Friend, add them to ExpandableList
+
+					for (int i = 0; i < friends.size(); i++) {
+						final Friend thisFriend = friends.get(i);
+						final int loc = i;
+						//getting reference to specific Event list
+						DatabaseReference thisRef = FirebaseDatabase.getInstance().getReference("EventLists").child(thisFriend.eventListID);
+						thisRef.addListenerForSingleValueEvent(new ValueEventListener() {
+							@Override
+							public void onDataChange(DataSnapshot dataSnapshot) {
+								synchronized (friends) {
+									synchronized (friendsEvents) {
+
+										Iterable<DataSnapshot> Children = dataSnapshot.getChildren();
+										ArrayList<Event> events = new ArrayList<Event>();
+										// getting all events and adding to the list events
+										// Except for the null Event which is added on Friend creation(to hold Database spot)
+										for (DataSnapshot Child : Children) {
+											Event thisEvent = Child.getValue(Event.class);
+											if (thisEvent != null) {
+												events.add(thisEvent);
+											}
+										}
+										// add list of events to the list friendsEvents
+										friendsEvents.add(events);
+
+
+										// insert Friend name into top level expandableList
+										Friend insert = friends.get(loc);
+										headerList.add(insert.name);
+
+
+										// create the sublist for the above added Friend
+										List<String> subList = new ArrayList<String>();
+										// add each Event to the sublist
+										if (friendsEvents.get(loc).size() == 0) {
+											subList.add("~Click to add an Event~");
+										} else {
+											for (int j = 0; j < friendsEvents.get(loc).size(); j++) {
+												subList.add(friendsEvents.get(loc).get(j).name);
+											}
+											subList.add("~Click to add an Event~");
+										}
+										// add sublist into lower level expandableList
+										eventList.put(headerList.get(loc), subList);
+
+										// if all friends+events have been loaded, display expandableList
+										if (loc == friends.size() - 1) {
+											myAdapter = new FriendsListAdapter(ctx, headerList, eventList);
+											friendList.setAdapter(myAdapter);
+										}
+									}
 								}
 							}
-							// add list of events to the list friendsEvents
-							friendsEvents.add(events);
 
-							// insert Friend name into top level expandableList
-							Friend insert = friends.get(loc);
-							headerList.add(insert.name);
+							@Override
+							public void onCancelled(DatabaseError databaseError) {
 
-
-							// create the sublist for the above added Friend
-							List<String> subList = new ArrayList<String>();
-							// add each Event to the sublist
-							if (friendsEvents.get(loc).size() == 0) {
-								subList.add("~Click to add an Event~");
-							} else {
-								for (int j = 0; j < friendsEvents.get(loc).size(); j++) {
-									subList.add(friendsEvents.get(loc).get(j).name);
-								}
-								subList.add("~Click to add an Event~");
 							}
-							// add sublist into lower level expandableList
-							eventList.put(headerList.get(loc), subList);
-
-							// if all friends+events have been loaded, display expandableList
-							if (loc == friends.size() - 1) {
-								myAdapter = new FriendsListAdapter(ctx, headerList, eventList);
-								friendList.setAdapter(myAdapter);
-							}
-
-
-						}
-
-						@Override
-						public void onCancelled(DatabaseError databaseError) {
-
-						}
-					});
+						});
+					}
 				}
 			}
 
@@ -178,11 +183,16 @@ public class FriendList extends AppCompatActivity {
 		friendList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
 			@Override
 			public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-				if (childPosition == myAdapter.getChildrenCount(groupPosition) - 1)
-					addEvent(friends.get(groupPosition));
+				if (childPosition == myAdapter.getChildrenCount(groupPosition) - 1){
+					synchronized (friends){
+						addEvent(friends.get(groupPosition));
+					}
+				}
 				else {
 					// send eventID to IdeaPage
-					openIdeaPage(friendsEvents.get(groupPosition).get(childPosition).eventID);
+					synchronized (friendsEvents){
+						openIdeaPage(friendsEvents.get(groupPosition).get(childPosition).eventID);
+					}
 				}
 
 				return false;
