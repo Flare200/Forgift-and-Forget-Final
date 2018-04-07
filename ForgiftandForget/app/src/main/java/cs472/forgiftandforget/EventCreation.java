@@ -42,11 +42,16 @@ public class EventCreation extends AppCompatActivity {
 	int minute;
 	Boolean timeSet = false;
 	Boolean dateSet = false;
-
+	Boolean returningFromCalendar = false;
 
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		if (returningFromCalendar) {
+			returningFromCalendar = false;
+			ReturnToFriendList();
+		}
+
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_event_creation);
 
@@ -97,10 +102,10 @@ public class EventCreation extends AppCompatActivity {
 	}
 
 	@Override
-	protected Dialog onCreateDialog(int id){
-		if(id == 0){
+	protected Dialog onCreateDialog(int id) {
+		if (id == 0) {
 			return new DatePickerDialog(this, datePickerListener, year, month, day);
-		}else if(id == 1) {
+		} else if (id == 1) {
 			return new TimePickerDialog(this, timePickerListener, hour, minute, false);
 		}
 		return null;
@@ -110,7 +115,7 @@ public class EventCreation extends AppCompatActivity {
 		@Override
 		public void onDateSet(DatePicker view, int chosenYear, int chosenMonth, int chosenDay) {
 			year = chosenYear;
-			month = chosenMonth+1;
+			month = chosenMonth + 1;
 			day = chosenDay;
 			String setDate = month + "/" + day + "/" + year;
 			dateField.setText(setDate);
@@ -127,15 +132,15 @@ public class EventCreation extends AppCompatActivity {
 			String amOrPm = "am";
 			String setTime;
 
-			if(hourFixed == 0){
+			if (hourFixed == 0) {
 				hourFixed = 12;
-			}else if(hourFixed > 12){
+			} else if (hourFixed > 12) {
 				hourFixed -= 12;
 				amOrPm = "pm";
 			}
-			if(minute < TEN){
+			if (minute < TEN) {
 				setTime = hourFixed + ":0" + minute + amOrPm;
-			}else {
+			} else {
 				setTime = hourFixed + ":" + minute + amOrPm;
 			}
 			timeField.setText(setTime);
@@ -144,40 +149,26 @@ public class EventCreation extends AppCompatActivity {
 	};
 
 	public void addNewEvent(View view) {
-		if(!(dateSet && timeSet)){
+		if (!(dateSet && timeSet)) {
 			Toast.makeText(getApplicationContext(), "Please set date and time first", Toast.LENGTH_LONG).show();
 			return;
 		}
 		Event newEvent = new Event(eventField.getText().toString(), dateField.getText().toString());
 		Event.AddEvent(eventListID, friendID, newEvent);
-		Toast.makeText(getApplicationContext(), "Adding " + newEvent.name +" to events", Toast.LENGTH_LONG).show();
+		Toast.makeText(getApplicationContext(), "Adding " + newEvent.name + " to events", Toast.LENGTH_LONG).show();
 
-		/*
-		long calID = 3;
-		long startMillis = 0;
-		long endMillis = 0;
 		Calendar startTime = Calendar.getInstance();
-		startTime.set(year, month-1, day, hour, minute);
+		startTime.set(year, month - 1, day, hour, minute);
 		Calendar endTime = Calendar.getInstance();
-		endTime.set(year, month-1, day, hour, minute);
+		endTime.set(year, month - 1, day, hour, minute);
 
-
-		*/
-		Calendar startTime = Calendar.getInstance();
-		startTime.set(year, month-1, day, hour, minute);
-		Calendar endTime = Calendar.getInstance();
-		endTime.set(year, month-1, day, hour, minute);
+		returningFromCalendar = true;
 		Intent calendarIntent = new Intent(Intent.ACTION_INSERT)
 				.setData(CalendarContract.Events.CONTENT_URI)
 				.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, startTime.getTimeInMillis())
 				.putExtra(CalendarContract.EXTRA_EVENT_END_TIME, endTime.getTimeInMillis())
 				.putExtra(CalendarContract.Events.TITLE, eventField.getText().toString());
 		startActivity(calendarIntent);
-
-		//Intent intent = new Intent(EventCreation.this, FriendList.class);
-		//finish();
-		//startActivity(intent);
-
 	}
 
 
@@ -189,5 +180,21 @@ public class EventCreation extends AppCompatActivity {
 			startActivity(intent);
 		}
 		return super.onKeyDown(keyCode, event);
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+
+		if (returningFromCalendar) {
+			returningFromCalendar = false;
+			ReturnToFriendList();
+		}
+	}
+
+	private void ReturnToFriendList() {
+		Intent intent = new Intent(EventCreation.this, FriendList.class);
+		finish();
+		startActivity(intent);
 	}
 }
