@@ -78,7 +78,7 @@ public class Friend {
 
 	@Exclude
 	//accepts a friend object, to add to the current users friends list
-	public static int AddFriend(Friend newFriend, final Uri contactImageUri) {
+	public static void AddFriend(Friend newFriend, final Uri contactImageUri, DatabaseReference.CompletionListener listener) {
 
 		//get database reference to the node of the logged in UID
 		DatabaseReference friendsListsRef = GetFriendsListsReference().child(Database.GetCurrentUID());
@@ -96,24 +96,7 @@ public class Friend {
 		newFriend.friendID = friendID;
 		newFriend.imageID = imageID;
 
-		//add newFriend to users friends list inside database
-		friendsListsRef.child(friendID).setValue(newFriend, new DatabaseReference.CompletionListener() {
-			@Override
-			public void onComplete(DatabaseError error, DatabaseReference ref) {
-				if (error != null) {
-					Database.errorCode = 1;
-				} else {
-					// completed successfully
-					eventListRef.child(eventListID).setValue(".");
-		            /*if (contactImageUri != null) {
-                        storageRef.child(imageID).putFile(contactImageUri);
-                    }*/
-					Database.errorCode = 0;
-				}
-			}
-		});
-
-		return Database.errorCode;
+		friendsListsRef.child(friendID).setValue(newFriend, listener);
 	}
 
 	public int updateFriend(Uri updatedContactImage){
