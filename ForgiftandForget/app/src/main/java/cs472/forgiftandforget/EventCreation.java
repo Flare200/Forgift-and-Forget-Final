@@ -3,9 +3,14 @@ package cs472.forgiftandforget;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
+import android.provider.CalendarContract;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.InputType;
@@ -35,6 +40,10 @@ public class EventCreation extends AppCompatActivity {
 	int day;
 	int hour;
 	int minute;
+	Boolean timeSet = false;
+	Boolean dateSet = false;
+
+
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -105,6 +114,7 @@ public class EventCreation extends AppCompatActivity {
 			day = chosenDay;
 			String setDate = month + "/" + day + "/" + year;
 			dateField.setText(setDate);
+			dateSet = true;
 		}
 	};
 
@@ -112,34 +122,64 @@ public class EventCreation extends AppCompatActivity {
 		@Override
 		public void onTimeSet(TimePicker view, int hourOfDay, int minuteOfHour) {
 			hour = hourOfDay;
+			int hourFixed = hour;
 			minute = minuteOfHour;
 			String amOrPm = "am";
 			String setTime;
-			if(hour > MAX_HOURS){
-				hour = hour-MAX_HOURS;
+
+			if(hourFixed == 0){
+				hourFixed = 12;
+			}else if(hourFixed > 12){
+				hourFixed -= 12;
 				amOrPm = "pm";
 			}
 			if(minute < TEN){
-				setTime = hour + ":0" + minute + amOrPm;
+				setTime = hourFixed + ":0" + minute + amOrPm;
 			}else {
-				setTime = hour + ":" + minute + amOrPm;
+				setTime = hourFixed + ":" + minute + amOrPm;
 			}
 			timeField.setText(setTime);
+			timeSet = true;
 		}
 	};
 
 	public void addNewEvent(View view) {
-		Event newEvent = new Event(eventField.getText().toString(), dateField.getText().toString());
-		if(Event.AddEvent(eventListID, friendID, newEvent) == 0){
-			Toast.makeText(getApplicationContext(), newEvent.name +" Added to events", Toast.LENGTH_LONG).show();
-		}else{
-			// error adding event
-			Toast.makeText(getApplicationContext(), "Unable to add Event. Please try again", Toast.LENGTH_LONG).show();
+		if(!(dateSet && timeSet)){
+			Toast.makeText(getApplicationContext(), "Please set date and time first", Toast.LENGTH_LONG).show();
+			return;
 		}
-		Intent intent = new Intent(EventCreation.this, FriendList.class);
-		finish();
-		startActivity(intent);
+		Event newEvent = new Event(eventField.getText().toString(), dateField.getText().toString());
+		Event.AddEvent(eventListID, friendID, newEvent);
+		Toast.makeText(getApplicationContext(), "Adding " + newEvent.name +" to events", Toast.LENGTH_LONG).show();
+
+		/*
+		long calID = 3;
+		long startMillis = 0;
+		long endMillis = 0;
+		Calendar startTime = Calendar.getInstance();
+		startTime.set(year, month-1, day, hour, minute);
+		Calendar endTime = Calendar.getInstance();
+		endTime.set(year, month-1, day, hour, minute);
+
+
+		*/
+		Calendar startTime = Calendar.getInstance();
+		startTime.set(year, month-1, day, hour, minute);
+		Calendar endTime = Calendar.getInstance();
+		endTime.set(year, month-1, day, hour, minute);
+		Intent calendarIntent = new Intent(Intent.ACTION_INSERT)
+				.setData(CalendarContract.Events.CONTENT_URI)
+				.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, startTime.getTimeInMillis())
+				.putExtra(CalendarContract.EXTRA_EVENT_END_TIME, endTime.getTimeInMillis())
+				.putExtra(CalendarContract.Events.TITLE, eventField.getText().toString());
+		startActivity(calendarIntent);
+
+		//Intent intent = new Intent(EventCreation.this, FriendList.class);
+		//finish();
+		//startActivity(intent);
+
 	}
+
 
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
