@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import cs472.forgiftandforget.DatabaseClasses.Database;
+import cs472.forgiftandforget.DatabaseClasses.Event;
 import cs472.forgiftandforget.DatabaseClasses.Friend;
 
 import android.widget.ImageView;
@@ -77,20 +78,31 @@ public class FriendCreation extends AppCompatActivity implements View.OnClickLis
 		}
 	}
 
-	public void addFriend(){
+	public void addFriend() {
 		final String newName = nameField.getText().toString().trim();
-		Friend newFriend = new Friend(newName);
+		final Friend newFriend = new Friend(newName);
+		final Intent intent = new Intent(FriendCreation.this, FriendList.class);
 
-		if (Friend.AddFriend(newFriend, contactImageUri) == 0) {
-			// completed successfully
-			Toast.makeText(getApplicationContext(), newName + " Added to Friend's List", Toast.LENGTH_LONG).show();
-		} else {
-			// error adding friend
-			Toast.makeText(getApplicationContext(), "Unable to add Friend. Please try again", Toast.LENGTH_LONG).show();
-		}
-		Intent intent = new Intent(FriendCreation.this, FriendList.class);
-		finish();
-		startActivity(intent);
+		//create a new listener for AddFriend
+		DatabaseReference.CompletionListener listener = new DatabaseReference.CompletionListener() {
+			@Override
+			public void onComplete(DatabaseError error, DatabaseReference ref) {
+				if (error != null) {
+					//error, notify user and do nothing.
+					Toast.makeText(getApplicationContext(), "Unable to add Friend. Please try again", Toast.LENGTH_LONG).show();
+				} else {
+					// completed successfully
+					Event.GetEventListsReference().child(newFriend.eventListID).setValue(".");
+
+					//UI things
+					Toast.makeText(getApplicationContext(), newName + " Added to Friend's List", Toast.LENGTH_LONG).show();
+					finish();
+					startActivity(intent);
+				}
+			}
+		};
+
+		Friend.AddFriend(newFriend, contactImageUri, listener);
 	}
 
 	public void updateFriend(){
