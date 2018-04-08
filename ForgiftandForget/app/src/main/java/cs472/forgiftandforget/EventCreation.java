@@ -22,6 +22,7 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import java.util.Calendar;
+import java.util.TimeZone;
 
 import cs472.forgiftandforget.DatabaseClasses.Event;
 
@@ -43,6 +44,7 @@ public class EventCreation extends AppCompatActivity {
 	Boolean timeSet = false;
 	Boolean dateSet = false;
 	Boolean returningFromCalendar = false;
+	int calendarID = 0;
 
 
 	@Override
@@ -54,6 +56,23 @@ public class EventCreation extends AppCompatActivity {
 
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_event_creation);
+
+		Uri uri = CalendarContract.Calendars.CONTENT_URI;
+		try {
+			Cursor calendarCursor = managedQuery(uri, null, null, null, null);
+
+			int indexPrimary = calendarCursor.getColumnIndexOrThrow(CalendarContract.Calendars.IS_PRIMARY);
+			int indexID = calendarCursor.getColumnIndexOrThrow(CalendarContract.Calendars._ID);
+			while (calendarCursor.moveToNext()) {
+				if (calendarCursor.getInt(indexPrimary) == 1) {
+					calendarID = calendarCursor.getInt(indexID);
+				}
+			}
+		}catch(Exception e) {
+			// my device(ZTE Axon7) has no isPrimary column in the table, but id of 1 works for me
+			calendarID = 1;
+		}
+
 
 		eventListID = getIntent().getStringExtra("ELID");
 		friendID = getIntent().getStringExtra("FID");
@@ -163,12 +182,30 @@ public class EventCreation extends AppCompatActivity {
 		endTime.set(year, month - 1, day, hour, minute);
 
 		returningFromCalendar = true;
-		Intent calendarIntent = new Intent(Intent.ACTION_INSERT)
-				.setData(CalendarContract.Events.CONTENT_URI)
-				.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, startTime.getTimeInMillis())
-				.putExtra(CalendarContract.EXTRA_EVENT_END_TIME, endTime.getTimeInMillis())
-				.putExtra(CalendarContract.Events.TITLE, eventField.getText().toString());
-		startActivity(calendarIntent);
+		ContentResolver cr = getContentResolver();
+		ContentValues values = new ContentValues();
+		TimeZone timeZone = TimeZone.getDefault();
+		values.put(CalendarContract.Events.DTSTART, startTime.getTimeInMillis());
+		values.put(CalendarContract.Events.DTEND, endTime.getTimeInMillis());
+		values.put(CalendarContract.Events.EVENT_TIMEZONE, timeZone.getID());
+		values.put(CalendarContract.Events.TITLE, eventField.getText().toString());
+		values.put(CalendarContract.Events.DESCRIPTION, eventField.getText().toString());
+		values.put(CalendarContract.Events.CALENDAR_ID, calendarID);
+		values.put(CalendarContract.Events.HAS_ALARM, 1);
+		Uri uri = cr.insert(CalendarContract.Events.CONTENT_URI, values);
+		String calendarEventID = uri.getLastPathSegment();
+
+
+		Uri REMINDERS_URI = Uri.parse("content://com.android.calendar/reminders");
+		values = new ContentValues();
+		values.put( "event_id", calendarEventID);
+		values.put( "method", 1 );
+		values.put( "minutes", 1 );
+		getContentResolver().insert( REMINDERS_URI, values );
+
+		Intent intent = new Intent(EventCreation.this, FriendList.class);
+		finish();
+		startActivity(intent);
 	}
 
 
