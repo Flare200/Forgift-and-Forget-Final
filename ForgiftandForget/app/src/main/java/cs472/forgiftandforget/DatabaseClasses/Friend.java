@@ -40,7 +40,7 @@ public class Friend {
 	}
 
 	@Exclude
-	public static void RemoveFriend(String friendID) {
+	public static void RemoveFriend(String friendID, final DatabaseReference.CompletionListener completionListener) {
 
 		final DatabaseReference friendsListRef = GetFriendsListsReference().child(Database.GetCurrentUID()).child(friendID);
 		friendsListRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -50,22 +50,24 @@ public class Friend {
 				String imageID;
 				java.lang.Object temp;
 				temp = dataSnapshot.child("eventListID").getValue();
-				if(temp != null){
+				if (temp != null) {
 					eventListID = temp.toString();
 					Event.RemoveEventList(eventListID);
-				}
-				else{
+				} else {
 					// no friend to remove
 					return;
 				}
 				temp = dataSnapshot.child("imageID").getValue();
-				if(temp != null){
+				if (temp != null) {
 					imageID = temp.toString();
 					// ToDo remove image from database
 				}
-
-
-				friendsListRef.removeValue();
+				
+				if (completionListener == null) {
+					friendsListRef.removeValue();
+				} else {
+					friendsListRef.removeValue(completionListener);
+				}
 
 			}
 
@@ -74,6 +76,7 @@ public class Friend {
 				//do nothing
 			}
 		});
+
 	}
 
 	@Exclude
@@ -99,7 +102,7 @@ public class Friend {
 		friendsListsRef.child(friendID).setValue(newFriend, listener);
 	}
 
-	public int updateFriend(Uri updatedContactImage){
+	public int updateFriend(Uri updatedContactImage) {
 		DatabaseReference friendsListsRef = GetFriendsListsReference().child(Database.GetCurrentUID());
 		friendsListsRef.child(this.friendID).setValue(this, new DatabaseReference.CompletionListener() {
 			@Override
@@ -109,7 +112,7 @@ public class Friend {
 				} else {
 					// ToDO deal with update of contact image when storage reference is put back into project
 					// completed successfully
-		            /*if (contactImageUri != null) {
+			        /*if (contactImageUri != null) {
                         storageRef.child(imageID).putFile(contactImageUri);
                     }*/
 					Database.errorCode = 0;
