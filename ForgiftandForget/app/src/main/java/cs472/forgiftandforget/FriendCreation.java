@@ -1,10 +1,12 @@
 package cs472.forgiftandforget;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.KeyEvent;
@@ -19,17 +21,25 @@ import cs472.forgiftandforget.DatabaseClasses.Friend;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FileDownloadTask;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 
 public class FriendCreation extends AppCompatActivity implements View.OnClickListener {
 	EditText nameField;
 	ImageView friendImage;
 	DatabaseReference friendsListReference;
+	StorageReference storageReference;
 	static final int GALLERY = 1;
 	Uri contactImageUri;
 	String friendID;
@@ -50,10 +60,7 @@ public class FriendCreation extends AppCompatActivity implements View.OnClickLis
 
 		option = getIntent().getIntExtra("option", 0);
 		if(option == 1) {
-			String update = "Update";
-			friendID = getIntent().getStringExtra("friendID");
-			addOrUpdateButton.setText(update);
-			deleteButton.setVisibility(View.VISIBLE);
+			setupUpdateScreen();
 		}
 
 	}
@@ -174,6 +181,58 @@ public class FriendCreation extends AppCompatActivity implements View.OnClickLis
 				e.printStackTrace();
 			}
 		}
+	}
+
+	public void setupUpdateScreen(){
+		final ProgressDialog progress = new ProgressDialog(this);
+		progress.setTitle("Loading Contact Information");
+		progress.setMessage("Loading...");
+		progress.setCancelable(false); // disable dismiss by tapping outside of the dialog
+		progress.show();
+
+		String update = "Update";
+		friendID = getIntent().getStringExtra("friendID");
+		addOrUpdateButton.setText(update);
+		deleteButton.setVisibility(View.VISIBLE);
+		friendsListReference = Friend.GetFriendsListsReference().child(Database.GetCurrentUID()).child(friendID);
+		storageReference = FirebaseStorage.getInstance().getReference("contactImages");
+		friendsListReference.addListenerForSingleValueEvent(new ValueEventListener() {
+			@Override
+			public void onDataChange(DataSnapshot dataSnapshot) {
+
+				nameField.setText(dataSnapshot.child("name").getValue().toString());
+				String imageID = dataSnapshot.child("imageID").getValue().toString();
+				if(!imageID.equals("null"))
+				try {
+					File contactImageFile = File.createTempFile("images", "jpg");
+					final Uri contactImageUri = Uri.parse(contactImageFile.getAbsolutePath());
+					storageReference.child(imageID).getFile(contactImageFile)
+							.addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+						@Override
+						public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+							friendImage.setImageURI(contactImageUri);
+							progress.dismiss();
+						}
+					}).addOnFailureListener(new OnFailureListener() {
+						@Override
+						public void onFailure(@NonNull Exception e) {
+							// no image, or image download failed
+							progress.dismiss();
+						}
+					});
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+
+
+			}
+
+			@Override
+			public void onCancelled(DatabaseError databaseError) {
+
+			}
+		});
+
 	}
 }
 
