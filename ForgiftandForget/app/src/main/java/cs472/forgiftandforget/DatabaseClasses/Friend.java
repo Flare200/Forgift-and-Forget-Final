@@ -42,7 +42,7 @@ public class Friend {
 	}
 
 	@Exclude
-	public static void RemoveFriend(String friendID) {
+	public static void RemoveFriend(String friendID, final DatabaseReference.CompletionListener completionListener) {
 
 		final DatabaseReference friendsListRef = GetFriendsListsReference().child(Database.GetCurrentUID()).child(friendID);
 		friendsListRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -52,22 +52,24 @@ public class Friend {
 				String imageID;
 				java.lang.Object temp;
 				temp = dataSnapshot.child("eventListID").getValue();
-				if(temp != null){
+				if (temp != null) {
 					eventListID = temp.toString();
 					Event.RemoveEventList(eventListID);
-				}
-				else{
+				} else {
 					// no friend to remove
 					return;
 				}
 				temp = dataSnapshot.child("imageID").getValue();
-				if(temp != null){
+				if (temp != null) {
 					imageID = temp.toString();
 					// ToDo remove image from database
 				}
-
-
-				friendsListRef.removeValue();
+				
+				if (completionListener == null) {
+					friendsListRef.removeValue();
+				} else {
+					friendsListRef.removeValue(completionListener);
+				}
 
 			}
 
@@ -76,6 +78,7 @@ public class Friend {
 				//do nothing
 			}
 		});
+
 	}
 
 	@Exclude
