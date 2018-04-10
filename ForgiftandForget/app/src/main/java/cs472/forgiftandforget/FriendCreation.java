@@ -59,20 +59,34 @@ public class FriendCreation extends AppCompatActivity implements View.OnClickLis
 	}
 
 
-	public void deleteFriend(View view){
-		Friend.RemoveFriend(friendID);
+	public void deleteFriend(View view) {
 		Toast.makeText(getApplicationContext(), "Removed Friend", Toast.LENGTH_LONG).show();
-		Intent intent = new Intent(FriendCreation.this, FriendList.class);
-		finish();
-		startActivity(intent);
+		final Intent intent = new Intent(FriendCreation.this, FriendList.class);
+
+		//create a new listener for AddFriend
+		DatabaseReference.CompletionListener completionListener = new DatabaseReference.CompletionListener() {
+			@Override
+			public void onComplete(DatabaseError error, DatabaseReference ref) {
+				if (error != null) {
+					//error, notify user and do nothing.
+					Toast.makeText(getApplicationContext(), "Unable to delete Friend. Please try again", Toast.LENGTH_LONG).show();
+				} else {
+					// completed successfully
+					finish();
+					startActivity(intent);
+				}
+			}
+		};
+
+		Friend.RemoveFriend(friendID, completionListener);
 	}
 
 	public void addOrUpdateFriend(View view) {
-		switch (option){
-			case 0 :
+		switch (option) {
+			case 0:
 				addFriend();
 				break;
-			case 1 :
+			case 1:
 				updateFriend();
 				break;
 		}
