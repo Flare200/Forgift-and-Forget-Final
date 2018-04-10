@@ -6,6 +6,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Exclude;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import android.net.Uri;
 
@@ -83,9 +85,13 @@ public class Friend {
 		//get database reference to the node of the logged in UID
 		DatabaseReference friendsListsRef = GetFriendsListsReference().child(Database.GetCurrentUID());
 
+
+
+
 		// get references to images and event list nodes
 		final DatabaseReference eventListRef = Event.GetEventListsReference();
-		//storageRef = FirebaseStorage.getInstance().getReference().child("contactImages");
+		final StorageReference storageReference = FirebaseStorage.getInstance().getReference("contactImages");
+
 
 		//push new unique new keys, load into newFriend object
 		final String friendID = friendsListsRef.push().getKey();
@@ -95,12 +101,15 @@ public class Friend {
 		newFriend.eventListID = eventListID;
 		newFriend.friendID = friendID;
 		newFriend.imageID = imageID;
-
+		if(contactImageUri != null) {
+			storageReference.child(imageID).putFile(contactImageUri);
+		}
 		friendsListsRef.child(friendID).setValue(newFriend, listener);
 	}
 
-	public int updateFriend(Uri updatedContactImage){
+	public int updateFriend(final Uri updatedContactImage){
 		DatabaseReference friendsListsRef = GetFriendsListsReference().child(Database.GetCurrentUID());
+		final StorageReference storageReference = FirebaseStorage.getInstance().getReference("contactImages");
 		friendsListsRef.child(this.friendID).setValue(this, new DatabaseReference.CompletionListener() {
 			@Override
 			public void onComplete(DatabaseError error, DatabaseReference ref) {
@@ -109,9 +118,9 @@ public class Friend {
 				} else {
 					// ToDO deal with update of contact image when storage reference is put back into project
 					// completed successfully
-		            /*if (contactImageUri != null) {
-                        storageRef.child(imageID).putFile(contactImageUri);
-                    }*/
+		            if (updatedContactImage != null) {
+                        storageReference.child(imageID).putFile(updatedContactImage);
+                    }
 					Database.errorCode = 0;
 				}
 			}
