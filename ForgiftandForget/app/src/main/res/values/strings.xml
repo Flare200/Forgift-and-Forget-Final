@@ -30,4 +30,13 @@
     <string name="Date">Date: mm-dd-yyyy</string>
     <string name="Time">Time</string>
     <string name="Add_Event">Add Event</string>
+    <string name="reset_password">Reset Password</string>
+    <string name="email_address">Email Address</string>
+    <string name="password">Password</string>
+    <string name="login">Login</string>
+    <string name="new_user_register">New User? Register.</string>
+    <string name="forgot_password">Forgot Password?</string>
+    <string name="email">Email</string>
+    <string name="register">Register</string>
+    <string name="already_registered_login">Already Registered? Login.</string>
 </resources>

@@ -1,7 +1,9 @@
 package cs472.forgiftandforget;
 
+import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.Icon;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -9,11 +11,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ExpandableListView;
-
+import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -43,6 +44,7 @@ public class FriendList extends AppCompatActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_friend_list);
+		this.setTitle("Friends List");
 
 		database = new Database();
 		friendsListReference = Friend.GetFriendsListsReference().child(Database.GetCurrentUID());
@@ -136,12 +138,14 @@ public class FriendList extends AppCompatActivity {
 											subList.add(subEvent.name);
 										}
 										subList.add("~Click to add an Event~");
+										subList.add("~View Gifted List~");
 
 										// add sublist into lower level expandableList
 										eventList.put(thisFriend.name, subList);
 
 										//If each event list for each friend is populated (aka, this is
 										if (iterationCount == goalIterations) {
+											// done loading friends
 											myAdapter = new FriendsListAdapter(ctx, headerList, eventList);
 											friendList.setAdapter(myAdapter);
 										}
@@ -154,6 +158,11 @@ public class FriendList extends AppCompatActivity {
 								@Override
 								public void onCancelled(DatabaseError databaseError) { }
 							});
+						}
+						if(friends.size() == 0){
+							// no friends, force user to add first friend
+							Toast.makeText(getApplicationContext(), "No Friends found, Add a friend to continue", Toast.LENGTH_LONG).show();
+							addFriend();
 						}
 					}
 				}
@@ -169,9 +178,11 @@ public class FriendList extends AppCompatActivity {
 				@Override
 				public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
 					synchronized (friendLock) {
-						if (childPosition == myAdapter.getChildrenCount(groupPosition) - 1) {
+						if (childPosition == myAdapter.getChildrenCount(groupPosition) - 2) {
 							addEvent(friends.get(groupPosition));
-						} else {
+						}else if(childPosition == myAdapter.getChildrenCount(groupPosition) - 1) {
+							// ToDo send to gifted page (pass friend ID through)
+						}else{
 							// send eventID to IdeaPage
 							openIdeaPage(friendsEvents.get(groupPosition).get(childPosition).eventID);
 						}
