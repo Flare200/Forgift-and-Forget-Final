@@ -223,6 +223,7 @@ public class FriendCreation extends AppCompatActivity implements View.OnClickLis
 					});
 				} catch (IOException e) {
 					e.printStackTrace();
+					progress.dismiss();
 				}
 
 

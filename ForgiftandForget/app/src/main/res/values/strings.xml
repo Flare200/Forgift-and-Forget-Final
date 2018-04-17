@@ -39,4 +39,6 @@
     <string name="email">Email</string>
     <string name="register">Register</string>
     <string name="already_registered_login">Already Registered? Login.</string>
+    <string name="update_event">Update Event</string>
+    <string name="delete_event">Delete Event</string>
 </resources>

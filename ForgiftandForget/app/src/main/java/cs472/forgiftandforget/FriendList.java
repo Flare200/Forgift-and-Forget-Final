@@ -58,6 +58,7 @@ public class FriendList extends AppCompatActivity {
 					ExpandableListView.getPackedPositionType(position);
 					int type = ExpandableListView.getPackedPositionType(position);
 					int friendPosition = ExpandableListView.getPackedPositionGroup(position);
+					int eventPosition = ExpandableListView.getPackedPositionChild(position);
 
 					switch (type) {
 						case ExpandableListView.PACKED_POSITION_TYPE_GROUP: {
@@ -229,6 +230,7 @@ public class FriendList extends AppCompatActivity {
 		Intent eventIntent = new Intent(ctx, EventCreation.class);
 		eventIntent.putExtra("ELID", currentFriend.eventListID);
 		eventIntent.putExtra("FID", currentFriend.friendID);
+		eventIntent.putExtra("option", 0);
 		finish();
 		startActivity(eventIntent);
 	}
