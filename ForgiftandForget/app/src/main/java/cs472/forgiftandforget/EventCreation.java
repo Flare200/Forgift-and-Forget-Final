@@ -18,8 +18,13 @@ import android.os.Bundle;
 import android.text.InputType;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
@@ -28,36 +33,37 @@ import java.util.TimeZone;
 
 import cs472.forgiftandforget.DatabaseClasses.Event;
 
-public class EventCreation extends AppCompatActivity {
+public class EventCreation extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 	EditText eventField;
 	EditText dateField;
 	EditText timeField;
+	Spinner spinner;
 	private String eventListID;
 	private String friendID;
 	final static int TIME_PICK = 1;
 	final static int DATE_PICK = 0;
 	final static int TEN = 10;
 	final static int TWELVE = 12;
+	final static int MINUTES_IN_A_DAY = 1440;
+	final static int MINUTES_IN_A_WEEK = 10080;
 	final static int MY_PERMISSIONS_REQUEST_READ_WRITE_CALENDAR = 88;
+	final static String[] reminderStrings = {"No Reminder", "1 Day Before", "2 Days Before",
+											"1 Week Before", "2 Weeks Before", "Set Reminder..."};
 	int year;
 	int month;
 	int day;
 	int hour;
 	int minute;
+	int reminderTime;
 	Boolean timeSet = false;
 	Boolean dateSet = false;
-	Boolean returningFromCalendar = false;
 	int calendarID = 1;
+
 
 
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		if (returningFromCalendar) {
-			returningFromCalendar = false;
-			ReturnToFriendList();
-		}
-
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_event_creation);
 
@@ -67,6 +73,35 @@ public class EventCreation extends AppCompatActivity {
 		eventField = (EditText) findViewById(R.id.event);
 		dateField = (EditText) findViewById(R.id.date);
 		timeField = (EditText) findViewById(R.id.time);
+		spinner = (Spinner) findViewById(R.id.reminderSpinner);
+
+		// set up spinner adapter to allow a hint
+		ArrayAdapter<String> adapter = new ArrayAdapter<String>(EventCreation.this, android.R.layout.simple_spinner_dropdown_item) {
+			@Override
+			public View getView(int position, View convertView, ViewGroup parent) {
+
+				View v = super.getView(position, convertView, parent);
+				if (position == getCount()) {
+					((TextView)v.findViewById(android.R.id.text1)).setText("");
+					((TextView)v.findViewById(android.R.id.text1)).setHint(getItem(getCount())); // Hint to be displayed
+				}
+				return v;
+			}
+			@Override
+			public int getCount() {
+				return super.getCount()-1; // wont display last item. It is used as hint.
+			}
+		};
+		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		adapter.add(reminderStrings[0]);
+		adapter.add(reminderStrings[1]);
+		adapter.add(reminderStrings[2]);
+		adapter.add(reminderStrings[3]);
+		adapter.add(reminderStrings[4]);
+		adapter.add(reminderStrings[5]);
+		spinner.setAdapter(adapter);
+		spinner.setSelection(adapter.getCount());
+		spinner.setOnItemSelectedListener(this);
 
 		// set calendar to today
 		Calendar cal = Calendar.getInstance();
@@ -78,6 +113,7 @@ public class EventCreation extends AppCompatActivity {
 		dateField.setInputType(InputType.TYPE_NULL);
 		timeField.setInputType(InputType.TYPE_NULL);
 
+		// listeners to open date and time dialogs
 		dateField.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -108,6 +144,7 @@ public class EventCreation extends AppCompatActivity {
 		});
 	}
 
+	// chooses which dialog to display
 	@Override
 	protected Dialog onCreateDialog(int id) {
 		if (id == DATE_PICK) {
@@ -118,6 +155,7 @@ public class EventCreation extends AppCompatActivity {
 		return null;
 	}
 
+	// date was chosen
 	private DatePickerDialog.OnDateSetListener datePickerListener = new DatePickerDialog.OnDateSetListener() {
 		@Override
 		public void onDateSet(DatePicker view, int chosenYear, int chosenMonth, int chosenDay) {
@@ -130,6 +168,7 @@ public class EventCreation extends AppCompatActivity {
 		}
 	};
 
+	// time was chosen
 	private TimePickerDialog.OnTimeSetListener timePickerListener = new TimePickerDialog.OnTimeSetListener() {
 		@Override
 		public void onTimeSet(TimePicker view, int hourOfDay, int minuteOfHour) {
@@ -163,7 +202,7 @@ public class EventCreation extends AppCompatActivity {
 			Toast.makeText(getApplicationContext(), "Please set date and time first", Toast.LENGTH_LONG).show();
 			return;
 		}
-		Event newEvent = new Event(eventField.getText().toString(), dateField.getText().toString());
+		Event newEvent = new Event(eventField.getText().toString(), dateField.getText().toString(), timeField.getText().toString());
 		Event.AddEvent(eventListID, friendID, newEvent);
 		checkPermissions();
 	}
@@ -208,7 +247,6 @@ public class EventCreation extends AppCompatActivity {
 				}
 			}
 		}catch(Exception e) {
-			// my device(ZTE Axon7) has no isPrimary column in the table, but id of 1 works for me
 			calendarID = 1;
 		}
 
@@ -223,20 +261,24 @@ public class EventCreation extends AppCompatActivity {
 			values.put(CalendarContract.Events.TITLE, eventField.getText().toString());
 			values.put(CalendarContract.Events.DESCRIPTION, eventField.getText().toString());
 			values.put(CalendarContract.Events.CALENDAR_ID, calendarID);
-			values.put(CalendarContract.Events.HAS_ALARM, 1);
+			values.put(CalendarContract.Events.HAS_ALARM, 0);
 			Uri eventUri = cr.insert(CalendarContract.Events.CONTENT_URI, values);
 
-			// create and insert event reminder
-			String calendarEventID;
-			if (eventUri != null) {
-				calendarEventID = eventUri.getLastPathSegment();
-				Uri REMINDERS_URI = Uri.parse("content://com.android.calendar/reminders");
-				values = new ContentValues();
-				values.put("event_id", calendarEventID);
-				values.put("method", 1);
-				values.put("minutes", 1);
-				getContentResolver().insert(REMINDERS_URI, values);
+			// set up alarm if requested
+			if(reminderTime != 0) {
+				values.put(CalendarContract.Events.HAS_ALARM, 1);
+				String calendarEventID;
+				if (eventUri != null) {
+					calendarEventID = eventUri.getLastPathSegment();
+					Uri REMINDERS_URI = Uri.parse("content://com.android.calendar/reminders");
+					values = new ContentValues();
+					values.put("event_id", calendarEventID);
+					values.put("method", 1);
+					values.put("minutes", reminderTime);
+					getContentResolver().insert(REMINDERS_URI, values);
+				}
 			}
+
 
 		}catch(SecurityException e){
 			Toast.makeText(getApplicationContext(), "Added " + eventField.getText().toString() + "to events\nUnable to update Calendar", Toast.LENGTH_LONG).show();
@@ -289,5 +331,31 @@ public class EventCreation extends AppCompatActivity {
 			//permission was already granted
 			addCalendarEntry();
 		}
+	}
+
+
+	@Override
+	public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+		switch(position){
+			case 1 : // 1 day before
+				reminderTime = MINUTES_IN_A_DAY;
+				break;
+			case 2 : // 2 days before
+				reminderTime = MINUTES_IN_A_DAY * 2;
+				break;
+			case 3 : // 1 week before
+				reminderTime = MINUTES_IN_A_WEEK;
+				break;
+			case 4 : // 2 weeks before
+				reminderTime = MINUTES_IN_A_WEEK * 2;
+				break;
+			default : // set No reminder
+				reminderTime = 0;
+		}
+	}
+
+	@Override
+	public void onNothingSelected(AdapterView<?> parent) {
+
 	}
 }

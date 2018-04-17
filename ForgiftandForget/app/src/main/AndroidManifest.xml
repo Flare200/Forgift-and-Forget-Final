@@ -10,6 +10,7 @@
     <!-- To read primary calendar id, and write new events to the calendar -->
     <uses-permission android:name="android.permission.WRITE_CALENDAR" />
     <uses-permission android:name="android.permission.READ_CALENDAR" />
+
     <permission android:name="android.permission.READ_CALENDAR" />
     <permission android:name="android.permission.WRITE_CALENDAR" />
 
@@ -33,7 +34,8 @@
         <activity android:name=".GiftedList" />
         <activity android:name=".FriendCreation" />
         <activity android:name=".GiftIdeas" />
-        <activity android:name=".EventCreation"></activity>
+        <activity android:name=".EventCreation" />
+        <activity android:name=".PasswordReset"></activity>
     </application>
 
 </manifest>
