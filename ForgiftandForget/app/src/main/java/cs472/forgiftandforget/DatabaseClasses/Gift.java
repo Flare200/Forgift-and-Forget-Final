@@ -55,17 +55,18 @@ public class Gift
 	}
 
 	@Exclude
-	public static void AddGift(String friendIdKey, Gift giftToAdd) {
-		DatabaseReference giftListFriendRef = GetGiftListsReference().child(friendIdKey);
+	public static void AddGift(String eventID, Gift giftToAdd) {
+		DatabaseReference giftListRef = GetGiftListsReference().child(eventID);
 		DatabaseReference giftsRef = GetGiftsReference();
 
 		//generate GID and save under passed friendIdKey
-		DatabaseReference newGiftRef = giftListFriendRef.push();
+		DatabaseReference newGiftRef = giftListRef.push();
 		newGiftRef.setValue(".");
-
-		//
 		final String giftIdKey = newGiftRef.getKey();
-		giftsRef.setValue(giftIdKey);
+
+		// this was overwriting the first gift every time
+		// giftsRef.setValue(giftIdKey);
+
 		giftsRef.child(giftIdKey).setValue(giftToAdd);
 
 	}

@@ -43,7 +43,7 @@ public class IdeaCreation extends AppCompatActivity
             newIdea.url = URL;
             newIdea.description = description;
 
-            Gift.AddGift(friendID,newIdea);
+            Gift.AddGift(eventID,newIdea);
 
             endIntent();
         }

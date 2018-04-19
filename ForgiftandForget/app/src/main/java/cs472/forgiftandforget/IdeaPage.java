@@ -48,12 +48,11 @@ public class IdeaPage extends AppCompatActivity
 		eventID = getIntent().getStringExtra("eventID");
 		eventName = getIntent().getStringExtra("eventName");
 		giftListReference = Gift.GetGiftListsReference().child(eventID);
-		 ideaListView = (ListView) findViewById(R.id.ideaList);
+		ideaListView = (ListView) findViewById(R.id.ideaList);
 		//ideaListView = new ListView(IdeaPage.this);
 		setTitle(eventName);
 
 		final ArrayList<String> headerList = new ArrayList<String>();
-		headerList.add("CAN YOU READ ME?");
 
 
 		giftListReference.addListenerForSingleValueEvent(new ValueEventListener()
@@ -93,6 +92,9 @@ public class IdeaPage extends AppCompatActivity
 								{
 									headerList.add(gifts.get(i).name);
 								}
+								// gifts loaded, set adapter
+								ArrayAdapter<String> ideaPageAdapter = new ArrayAdapter<String>(IdeaPage.this, android.R.layout.simple_list_item_1,headerList);
+								ideaListView.setAdapter(ideaPageAdapter);
 							}
 
 						}
@@ -112,9 +114,6 @@ public class IdeaPage extends AppCompatActivity
 
 			}
 		});
-
-		ArrayAdapter<String> ideaPageAdapter = new ArrayAdapter<String>(IdeaPage.this,R.layout.idea_layout,headerList);
-		ideaListView.setAdapter(ideaPageAdapter);
 	}
 
 	@Override
