@@ -10,22 +10,43 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 
 import java.io.FileNotFoundException;
+
+import cs472.forgiftandforget.DatabaseClasses.Gift;
 
 public class GiftIdeas extends AppCompatActivity {
 
 	ImageView photo[] = new ImageView[3];
 	Button photoButton;
 	Bitmap defaultBitmap = null;
+	TextView nameField;
+	EditText notesField;
 	Uri imageUri;
+	String friendID;  // will need this later for sending to gifted list
+	String giftID;
+	Gift thisGift;
+	DatabaseReference giftReference;
 	private static final int PICK_IMAGE = 100;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_gift_ideas);
+
+		friendID = getIntent().getStringExtra("friendID");
+		giftID = getIntent().getStringExtra("giftID");
+		giftReference = Gift.GetGiftsReference().child(giftID);
+		nameField = (TextView) findViewById(R.id.giftIdeaName);
+		notesField = (EditText) findViewById(R.id.giftIdeaNotes);
 
 		photoButton = (Button) findViewById(R.id.giftPhotoButtonGallery);
 		photo[0] = (ImageView) findViewById(R.id.giftPhoto1);
@@ -42,9 +63,23 @@ public class GiftIdeas extends AppCompatActivity {
 				Intent intent = new Intent(Intent.ACTION_PICK,
 						android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 				startActivityForResult(intent, 0);
+			}
+		});
+
+		giftReference.addListenerForSingleValueEvent(new ValueEventListener() {
+			@Override
+			public void onDataChange(DataSnapshot dataSnapshot) {
+				thisGift = dataSnapshot.getValue(Gift.class);
+				loadGift();
+			}
+
+			@Override
+			public void onCancelled(DatabaseError databaseError) {
 
 			}
 		});
+
+
 	}
 
 	private void openGallery() {
@@ -74,5 +109,10 @@ public class GiftIdeas extends AppCompatActivity {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	public void loadGift(){
+		nameField.setText(thisGift.name);
+		notesField.setText(thisGift.description);
 	}
 }

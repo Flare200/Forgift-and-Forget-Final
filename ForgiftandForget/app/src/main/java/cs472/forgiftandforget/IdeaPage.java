@@ -11,6 +11,8 @@ import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -51,6 +53,16 @@ public class IdeaPage extends AppCompatActivity
 		ideaListView = (ListView) findViewById(R.id.ideaList);
 		//ideaListView = new ListView(IdeaPage.this);
 		setTitle(eventName);
+		ideaListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				Intent giftIntent = new Intent(IdeaPage.this, GiftIdeas.class);
+				giftIntent.putExtra("giftID", giftIDS.get(position));
+				giftIntent.putExtra("friendID", friendID);
+				finish();
+				startActivity(giftIntent);
+			}
+		});
 
 		final ArrayList<String> headerList = new ArrayList<String>();
 
