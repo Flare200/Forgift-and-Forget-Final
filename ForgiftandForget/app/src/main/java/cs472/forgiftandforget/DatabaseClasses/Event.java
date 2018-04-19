@@ -15,15 +15,17 @@ public class Event {
 	public String name;
 	public String date;
 	public String eventID;
+	public String time;
 
 	public Event() {
 		// empty constructor required for firebase
 	}
 
 	//parametrized constructor setting Event id to null(will be updated on Database AddEvent method)
-	public Event(String name, String date) {
+	public Event(String name, String date, String time) {
 		this.name = name;
 		this.date = date;
+		this.time = time;
 		this.eventID = "null";
 	}
 
