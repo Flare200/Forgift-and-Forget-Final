@@ -95,7 +95,6 @@ public class Event {
 		final DatabaseReference friendsListsRef = Friend.GetFriendsListsReference().child(Database.GetCurrentUID()).child(friendID);
 		final DatabaseReference giftListReference = Gift.GetGiftListsReference();
 		final String eventID = friendsListsRef.push().getKey();
-		final Gift blankGift = new Gift("null");
 		newEvent.eventID = eventID;
 
 		//add new value
@@ -115,6 +114,58 @@ public class Event {
 		});
 
 		return Database.errorCode;
+	}
+
+	@Exclude
+	public static int UpdateEvent(String eventListID, Event thisEvent) {
+		//get reference to specific Event list
+		final DatabaseReference eventListRef = GetEventListsReference().child(eventListID);
+
+		//add new value
+		eventListRef.child(thisEvent.eventID).setValue(thisEvent, new DatabaseReference.CompletionListener() {
+			@Override
+			public void onComplete(DatabaseError error, DatabaseReference databaseReference) {
+				if (error != null) {
+					//failed
+					Database.errorCode = 1;
+				} else {
+					//success
+					Database.errorCode = 0;
+				}
+			}
+		});
+
+		return Database.errorCode;
+	}
+
+	@Exclude
+	public static void RemoveSingleEvent(final String eventID, String eventListID) {
+		final DatabaseReference giftListsReference = Gift.GetGiftListsReference().child(eventID);
+		final DatabaseReference eventListReference = Event.GetEventListsReference().child(eventListID);
+		// remove the event from the eventList
+		eventListReference.child(eventID).removeValue();
+
+		// remove all gifts from the giftList
+		giftListsReference.addListenerForSingleValueEvent(new ValueEventListener() {
+			@Override
+			public void onDataChange(DataSnapshot dataSnapshot) {
+				Iterable<DataSnapshot> children = dataSnapshot.getChildren();
+				for (DataSnapshot Child : children) {
+					// get each giftID in the giftList, and remove them
+					java.lang.Object temp = Child.getKey();
+					if(temp != null) {
+						String giftID = temp.toString();
+						Gift.RemoveGift(giftID);
+					}
+				}
+				giftListsReference.removeValue();
+			}
+
+			@Override
+			public void onCancelled(DatabaseError databaseError) {
+				//do nothing
+			}
+		});
 	}
 
 }

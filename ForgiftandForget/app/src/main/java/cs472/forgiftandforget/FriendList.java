@@ -78,7 +78,17 @@ public class FriendList extends AppCompatActivity {
 						case ExpandableListView.PACKED_POSITION_TYPE_CHILD: {
 							// if event item clicked
 							// ToDo have an edit event option maybe? will need to verify they didnt click ~add event~
-
+							if(eventPosition < friendsEvents.get(friendPosition).size()){
+								Intent eventEditIntent = new Intent(ctx, EventCreation.class);
+								// set option so the activity knows this is an edit, instead of create
+								eventEditIntent.putExtra("option", 1);
+								// send event to edit
+								eventEditIntent.putExtra("eventID", friendsEvents.get(friendPosition).get(eventPosition).eventID);
+								eventEditIntent.putExtra("ELID", friends.get(friendPosition).eventListID);
+								eventEditIntent.putExtra("FID", friends.get(friendPosition).friendID);
+								finish();
+								startActivity(eventEditIntent);
+							}
 							return true;
 						}
 					}

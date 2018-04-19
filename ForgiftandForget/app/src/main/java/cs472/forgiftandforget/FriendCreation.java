@@ -121,6 +121,11 @@ public class FriendCreation extends AppCompatActivity implements View.OnClickLis
 
 	public void addFriend()
 	{
+		// require a name before continuing
+		if(nameField.getText().toString().trim().length() == 0){
+			Toast.makeText(getApplicationContext(), "Please add a name first", Toast.LENGTH_LONG).show();
+			return;
+		}
 		final String newName = nameField.getText().toString().trim();
 		final Friend newFriend = new Friend(newName);
 		final Intent intent = new Intent(FriendCreation.this, FriendList.class);
@@ -148,6 +153,11 @@ public class FriendCreation extends AppCompatActivity implements View.OnClickLis
 	}
 
 	public void updateFriend(){
+		// require a name before continuing
+		if(nameField.getText().toString().trim().length() == 0){
+			Toast.makeText(getApplicationContext(), "Please add a name first", Toast.LENGTH_LONG).show();
+			return;
+		}
 		final String newName = nameField.getText().toString().trim();
 		friendsListReference = Friend.GetFriendsListsReference().child(Database.GetCurrentUID()).child(friendID);
 		friendsListReference.addListenerForSingleValueEvent(new ValueEventListener() {
