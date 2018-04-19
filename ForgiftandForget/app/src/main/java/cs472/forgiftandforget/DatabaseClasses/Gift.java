@@ -11,7 +11,8 @@ import com.google.firebase.database.ValueEventListener;
  * Created by Tristan on 3/15/2018.
  */
 
-public class Gift {
+public class Gift
+{
 	public String name;
 	public String description;
 	public String imageID;
@@ -19,10 +20,10 @@ public class Gift {
 	public boolean gifted;
 
 	//Constructors
-	public Gift() {
-	}
+	public Gift(){}
 
-	public Gift(String name) {
+	public Gift(String name)
+	{
 		this.name = name;
 		this.description = "";
 		this.url = "";

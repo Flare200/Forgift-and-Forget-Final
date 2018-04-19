@@ -181,7 +181,8 @@ public class EventCreation extends AppCompatActivity {
 		super.onResume();
 	}
 
-	private void ReturnToFriendList() {
+	private void ReturnToFriendList()
+	{
 		Intent intent = new Intent(EventCreation.this, FriendList.class);
 		finish();
 		startActivity(intent);

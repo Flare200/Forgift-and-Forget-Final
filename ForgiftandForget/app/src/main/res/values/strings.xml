@@ -17,7 +17,8 @@
 
     <!-- Friends List Action Bar Strings-->
     <string name="add_friend">Add Friend</string>
-    <string name="Logout">Logout</string>
+    <string name="add_gift">Add Gift</string>
+    <string name="logout">Logout</string>
 
 
     <!-- Gift Idea Strings -->

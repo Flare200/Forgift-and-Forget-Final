@@ -48,7 +48,8 @@ public class FriendCreation extends AppCompatActivity implements View.OnClickLis
 	Button addOrUpdateButton;
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
+	protected void onCreate(Bundle savedInstanceState)
+	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_friend_creation);
 		friendImage = (ImageView) findViewById(R.id.contactImage);
@@ -62,11 +63,11 @@ public class FriendCreation extends AppCompatActivity implements View.OnClickLis
 		if(option == 1) {
 			setupUpdateScreen();
 		}
-
 	}
 
 
-	public void deleteFriend(View view) {
+	public void deleteFriend(View view)
+	{
 		Toast.makeText(getApplicationContext(), "Removed Friend", Toast.LENGTH_LONG).show();
 		final Intent intent = new Intent(FriendCreation.this, FriendList.class);
 
@@ -88,7 +89,8 @@ public class FriendCreation extends AppCompatActivity implements View.OnClickLis
 		Friend.RemoveFriend(friendID, completionListener);
 	}
 
-	public void addOrUpdateFriend(View view) {
+	public void addOrUpdateFriend(View view)
+	{
 		switch (option) {
 			case 0:
 				addFriend();
@@ -99,7 +101,8 @@ public class FriendCreation extends AppCompatActivity implements View.OnClickLis
 		}
 	}
 
-	public void addFriend() {
+	public void addFriend()
+	{
 		final String newName = nameField.getText().toString().trim();
 		final Friend newFriend = new Friend(newName);
 		final Intent intent = new Intent(FriendCreation.this, FriendList.class);
