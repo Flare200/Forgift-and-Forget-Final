@@ -1,12 +1,14 @@
 package cs472.forgiftandforget;
 
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.KeyEvent;
@@ -48,7 +50,8 @@ public class FriendCreation extends AppCompatActivity implements View.OnClickLis
 	Button addOrUpdateButton;
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
+	protected void onCreate(Bundle savedInstanceState)
+	{
 		super.onCreate(savedInstanceState);
 		this.setTitle("Add Friend");
 		setContentView(R.layout.activity_friend_creation);
@@ -63,12 +66,27 @@ public class FriendCreation extends AppCompatActivity implements View.OnClickLis
 		if(option == 1) {
 			setupUpdateScreen();
 		}
-
 	}
 
 
-	public void deleteFriend(View view) {
-		Toast.makeText(getApplicationContext(), "Removed Friend", Toast.LENGTH_LONG).show();
+	public void deleteFriend(View view)
+	{
+		AlertDialog.Builder builder = new AlertDialog.Builder(FriendCreation.this);
+		builder.setMessage("Permanently delete " + nameField.getText() + "?");
+		builder.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				removeFriend();
+			}
+		});
+		builder.setNegativeButton("Cancel", null);
+
+		AlertDialog alert = builder.create();
+		alert.show();
+	}
+
+	public void removeFriend(){
+		Toast.makeText(getApplicationContext(), "Removed " + nameField.getText() + " from Friends List.", Toast.LENGTH_LONG).show();
 		final Intent intent = new Intent(FriendCreation.this, FriendList.class);
 
 		//create a new listener for AddFriend
@@ -77,7 +95,7 @@ public class FriendCreation extends AppCompatActivity implements View.OnClickLis
 			public void onComplete(DatabaseError error, DatabaseReference ref) {
 				if (error != null) {
 					//error, notify user and do nothing.
-					Toast.makeText(getApplicationContext(), "Unable to delete Friend. Please try again", Toast.LENGTH_LONG).show();
+					Toast.makeText(getApplicationContext(), "Unable to delete Friend. Please try again.", Toast.LENGTH_LONG).show();
 				} else {
 					// completed successfully
 					finish();
@@ -89,7 +107,8 @@ public class FriendCreation extends AppCompatActivity implements View.OnClickLis
 		Friend.RemoveFriend(friendID, completionListener);
 	}
 
-	public void addOrUpdateFriend(View view) {
+	public void addOrUpdateFriend(View view)
+	{
 		switch (option) {
 			case 0:
 				addFriend();
@@ -100,7 +119,8 @@ public class FriendCreation extends AppCompatActivity implements View.OnClickLis
 		}
 	}
 
-	public void addFriend() {
+	public void addFriend()
+	{
 		final String newName = nameField.getText().toString().trim();
 		final Friend newFriend = new Friend(newName);
 		final Intent intent = new Intent(FriendCreation.this, FriendList.class);
@@ -111,13 +131,13 @@ public class FriendCreation extends AppCompatActivity implements View.OnClickLis
 			public void onComplete(DatabaseError error, DatabaseReference ref) {
 				if (error != null) {
 					//error, notify user and do nothing.
-					Toast.makeText(getApplicationContext(), "Unable to add Friend. Please try again", Toast.LENGTH_LONG).show();
+					Toast.makeText(getApplicationContext(), "Unable to add Friend. Please try again.", Toast.LENGTH_LONG).show();
 				} else {
 					// completed successfully
 					Event.GetEventListsReference().child(newFriend.eventListID).setValue(".");
 
 					//UI things
-					Toast.makeText(getApplicationContext(), newName + " Added to Friend's List", Toast.LENGTH_LONG).show();
+					Toast.makeText(getApplicationContext(), newName + " Added to Friends List.", Toast.LENGTH_LONG).show();
 					finish();
 					startActivity(intent);
 				}

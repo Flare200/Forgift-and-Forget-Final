@@ -34,7 +34,8 @@
         <activity android:name=".GiftedList" />
         <activity android:name=".FriendCreation" />
         <activity android:name=".GiftIdeas" />
-        <activity android:name=".EventCreation" />
+        <activity android:name=".EventCreation"/>
+        <activity android:name=".IdeaCreation"/>
         <activity android:name=".PasswordReset"></activity>
     </application>
 

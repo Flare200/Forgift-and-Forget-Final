@@ -15,17 +15,18 @@ import java.util.List;
  * Created by Aaron on 2/15/2018.
  */
 
-public class FriendsListAdapter extends BaseExpandableListAdapter {
+public class FriendsListAdapter extends BaseExpandableListAdapter
+{
 	private List<String> headerList;
 	private HashMap<String, List<String>> ideasList;
 	private Context ctx;
 
-	FriendsListAdapter(Context ctx, List<String> headerList, HashMap<String, List<String>> ideasList) {
+	FriendsListAdapter(Context ctx, List<String> headerList, HashMap<String, List<String>> ideasList)
+	{
 		this.ctx = ctx;
 		this.ideasList = ideasList;
 		this.headerList = headerList;
 	}
-
 
 	@Override
 	public int getGroupCount() {
@@ -63,9 +64,11 @@ public class FriendsListAdapter extends BaseExpandableListAdapter {
 	}
 
 	@Override
-	public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
+	public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent)
+	{
 		String title = (String) this.getGroup(groupPosition);
-		if (convertView == null) {
+		if (convertView == null)
+		{
 			LayoutInflater layoutInflater = (LayoutInflater) this.ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 			convertView = layoutInflater.inflate(R.layout.parent_layout, null);
 		}

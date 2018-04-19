@@ -220,7 +220,8 @@ public class EventCreation extends AppCompatActivity implements AdapterView.OnIt
 		super.onResume();
 	}
 
-	private void ReturnToFriendList() {
+	private void ReturnToFriendList()
+	{
 		Intent intent = new Intent(EventCreation.this, FriendList.class);
 		finish();
 		startActivity(intent);

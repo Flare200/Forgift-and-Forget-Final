@@ -41,7 +41,8 @@ public class FriendList extends AppCompatActivity {
 
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
+	protected void onCreate(Bundle savedInstanceState)
+    {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_friend_list);
 		this.setTitle("Friends List");
@@ -109,21 +110,27 @@ public class FriendList extends AppCompatActivity {
 						final int goalIterations = friends.size() - 1;
 
 						//for each Friend in the list get all events for the Friend, add them to ExpandableList
-						for (final Friend thisFriend : friends) {
+						for (final Friend thisFriend : friends)
+						{
 							//getting reference to specific Event list
 							DatabaseReference thisRef = FirebaseDatabase.getInstance().getReference("EventLists").child(thisFriend.eventListID);
-							thisRef.addListenerForSingleValueEvent(new ValueEventListener() {
+							thisRef.addListenerForSingleValueEvent(new ValueEventListener()
+							{
 								@Override
-								public void onDataChange(DataSnapshot dataSnapshot) {
-									synchronized (friendLock) {
+								public void onDataChange(DataSnapshot dataSnapshot)
+								{
+									synchronized (friendLock)
+									{
 										Iterable<DataSnapshot> Children = dataSnapshot.getChildren();
 
 										// Get all events and adding to the list events,
 										// Except for the null Event (which is added on Friend creation to hold Database spot)
 										ArrayList<Event> events = new ArrayList<Event>();
-										for (DataSnapshot Child : Children) {
+										for (DataSnapshot Child : Children)
+										{
 											Event thisEvent = Child.getValue(Event.class);
-											if (thisEvent != null) {
+											if (thisEvent != null)
+											{
 												events.add(thisEvent);
 											}
 										}
@@ -135,7 +142,8 @@ public class FriendList extends AppCompatActivity {
 
 										// create the sublist for the above added Friend
 										List<String> subList = new ArrayList<String>();
-										for (Event subEvent : events) {
+										for (Event subEvent : events)
+										{
 											subList.add(subEvent.name);
 										}
 										subList.add("~Click to add an Event~");
@@ -145,6 +153,7 @@ public class FriendList extends AppCompatActivity {
 										eventList.put(thisFriend.name, subList);
 
 										//If each event list for each friend is populated (aka, this is
+
 										if (iterationCount == goalIterations) {
 											// done loading friends
 											myAdapter = new FriendsListAdapter(ctx, headerList, eventList);
@@ -185,7 +194,7 @@ public class FriendList extends AppCompatActivity {
 							// ToDo send to gifted page (pass friend ID through)
 						}else{
 							// send eventID to IdeaPage
-							openIdeaPage(friendsEvents.get(groupPosition).get(childPosition).eventID);
+							openIdeaPage(friendsEvents.get(groupPosition).get(childPosition).eventID,friendsEvents.get(groupPosition).get(childPosition).name,friends.get(groupPosition));
 						}
 					}
 
@@ -218,7 +227,8 @@ public class FriendList extends AppCompatActivity {
 		}
 	}
 
-	private void addFriend() {
+	private void addFriend()
+	{
 		Intent friendIntent = new Intent(ctx, FriendCreation.class);
 		// send option so activity knows this is an add, and not edit
 		friendIntent.putExtra("option", 0);
@@ -226,7 +236,8 @@ public class FriendList extends AppCompatActivity {
 		startActivity(friendIntent);
 	}
 
-	private void addEvent(Friend currentFriend) {
+	private void addEvent(Friend currentFriend)
+	{
 		Intent eventIntent = new Intent(ctx, EventCreation.class);
 		eventIntent.putExtra("ELID", currentFriend.eventListID);
 		eventIntent.putExtra("FID", currentFriend.friendID);
@@ -235,9 +246,12 @@ public class FriendList extends AppCompatActivity {
 		startActivity(eventIntent);
 	}
 
-	private void openIdeaPage(String eventID) {
+	private void openIdeaPage(String eventID, String eventName, Friend currentFriend)
+	{
 		Intent ideaIntent = new Intent(ctx, IdeaPage.class);
 		ideaIntent.putExtra("eventID", eventID);
+		ideaIntent.putExtra("eventName",eventName);
+		ideaIntent.putExtra("friendID", currentFriend.friendID);
 		finish();
 		startActivity(ideaIntent);
 	}
