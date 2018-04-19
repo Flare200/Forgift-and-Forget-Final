@@ -9,11 +9,9 @@ import android.widget.EditText;
 import android.widget.Toast;
 import android.widget.ProgressBar;
 import android.support.annotation.NonNull;
-
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
-
 import cs472.forgiftandforget.DatabaseClasses.Database;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
@@ -29,13 +27,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-
 		progressBar = (ProgressBar) findViewById(R.id.progress);
 		emailField = (EditText) findViewById(R.id.emailField);
 		passwordField = (EditText) findViewById(R.id.passwordField);
 
 		findViewById(R.id.newUserButton).setOnClickListener(this);
 		findViewById(R.id.loginButton).setOnClickListener(this);
+		findViewById(R.id.forgotPasswordButton).setOnClickListener(this);
 	}
 
 
@@ -44,12 +42,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 	public void onClick(View view) {
 		switch (view.getId()) {
 			case R.id.newUserButton:
-				finish();
 				startActivity(new Intent(MainActivity.this, AccountCreation.class));
 				break;
-
 			case R.id.loginButton:
 				loginClicked();
+				break;
+			case R.id.forgotPasswordButton:
+				startActivity(new Intent(MainActivity.this, PasswordReset.class));
 				break;
 		}
 	}

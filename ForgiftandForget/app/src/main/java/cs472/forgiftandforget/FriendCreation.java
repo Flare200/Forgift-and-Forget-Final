@@ -51,6 +51,7 @@ public class FriendCreation extends AppCompatActivity implements View.OnClickLis
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
+		this.setTitle("Add Friend");
 		setContentView(R.layout.activity_friend_creation);
 		friendImage = (ImageView) findViewById(R.id.contactImage);
 		nameField = (EditText) findViewById(R.id.nameField);
@@ -225,6 +226,7 @@ public class FriendCreation extends AppCompatActivity implements View.OnClickLis
 					});
 				} catch (IOException e) {
 					e.printStackTrace();
+					progress.dismiss();
 				}
 
 
