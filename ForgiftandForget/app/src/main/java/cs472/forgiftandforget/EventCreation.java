@@ -2,9 +2,11 @@ package cs472.forgiftandforget;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -13,6 +15,7 @@ import android.provider.CalendarContract;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.InputType;
@@ -21,12 +24,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
+
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.Calendar;
 import java.util.TimeZone;
@@ -40,6 +49,8 @@ public class EventCreation extends AppCompatActivity implements AdapterView.OnIt
 	Spinner spinner;
 	private String eventListID;
 	private String friendID;
+	private int option;
+	private String eventID;
 	final static int TIME_PICK = 1;
 	final static int DATE_PICK = 0;
 	final static int TEN = 10;
@@ -66,9 +77,11 @@ public class EventCreation extends AppCompatActivity implements AdapterView.OnIt
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_event_creation);
-
+		option = getIntent().getIntExtra("option", 0);
 		eventListID = getIntent().getStringExtra("ELID");
 		friendID = getIntent().getStringExtra("FID");
+		eventID = getIntent().getStringExtra("eventID");
+
 
 		eventField = (EditText) findViewById(R.id.event);
 		dateField = (EditText) findViewById(R.id.date);
@@ -142,6 +155,10 @@ public class EventCreation extends AppCompatActivity implements AdapterView.OnIt
 				}
 			}
 		});
+
+		if(option == 1){
+			setUpUpdateScreen();
+		}
 	}
 
 	// chooses which dialog to display
@@ -198,12 +215,25 @@ public class EventCreation extends AppCompatActivity implements AdapterView.OnIt
 	};
 
 	public void addNewEvent(View view) {
+		// require event name to be set
+		if(eventField.getText().toString().trim().length() == 0){
+			Toast.makeText(getApplicationContext(), "Please set Event Name first", Toast.LENGTH_LONG).show();
+			return;
+		}
+		// require date and time to be set
 		if (!(dateSet && timeSet)) {
 			Toast.makeText(getApplicationContext(), "Please set date and time first", Toast.LENGTH_LONG).show();
 			return;
 		}
+
+		// add or update event in database
 		Event newEvent = new Event(eventField.getText().toString(), dateField.getText().toString(), timeField.getText().toString());
-		Event.AddEvent(eventListID, friendID, newEvent);
+		newEvent.eventID = eventID;
+		if(option == 0) {
+			Event.AddEvent(eventListID, friendID, newEvent);
+		}else{
+			Event.UpdateEvent(eventListID, newEvent);
+		}
 		checkPermissions();
 	}
 
@@ -285,7 +315,11 @@ public class EventCreation extends AppCompatActivity implements AdapterView.OnIt
 			Toast.makeText(getApplicationContext(), "Added " + eventField.getText().toString() + "to events\nUnable to update Calendar", Toast.LENGTH_LONG).show();
 			ReturnToFriendList();
 		}
-		Toast.makeText(getApplicationContext(), "Added " + eventField.getText().toString() + " to events and Calendar", Toast.LENGTH_LONG).show();
+		if(option == 0) { // new event added
+			Toast.makeText(getApplicationContext(), "Added " + eventField.getText().toString() + " to events and Calendar", Toast.LENGTH_LONG).show();
+		}else{ // old event updated
+			Toast.makeText(getApplicationContext(), "Updated " + eventField.getText().toString(), Toast.LENGTH_LONG).show();
+		}
 
 		ReturnToFriendList();
 	}
@@ -337,6 +371,7 @@ public class EventCreation extends AppCompatActivity implements AdapterView.OnIt
 
 	@Override
 	public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+		// spinner selection for reminder
 		switch(position){
 			case 1 : // 1 day before
 				reminderTime = MINUTES_IN_A_DAY;
@@ -358,5 +393,65 @@ public class EventCreation extends AppCompatActivity implements AdapterView.OnIt
 	@Override
 	public void onNothingSelected(AdapterView<?> parent) {
 
+	}
+
+
+	public void deleteEvent(View view){
+		// ask user to verify deletion
+		AlertDialog.Builder builder = new AlertDialog.Builder(EventCreation.this);
+		builder.setMessage("Permanently delete this Event,\nand all of its Gifts?");
+		builder.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				// remove event from database
+				Event.RemoveSingleEvent(eventID, eventListID);
+				ReturnToFriendList();
+			}
+		});
+		builder.setNegativeButton("Cancel", null);
+
+		AlertDialog alert = builder.create();
+		alert.show();
+	}
+
+	public void setUpUpdateScreen(){
+		// show progress dialog, in case event loads slowly
+		final ProgressDialog progress = new ProgressDialog(this);
+		progress.setTitle("Loading Event Information");
+		progress.setMessage("Loading...");
+		progress.setCancelable(false);
+		progress.show();
+
+		//update the buttons to update or delete
+		Button updateButton = (Button) findViewById(R.id.button2);
+		Button deleteButton = (Button) findViewById(R.id.eventDeleteButton);
+		String updateEvent = "UPDATE EVENT";
+		updateButton.setText(updateEvent);
+		deleteButton.setVisibility(View.VISIBLE);
+
+		// get reference to event to update, read in from database
+		DatabaseReference eventReference = Event.GetEventListsReference().child(eventListID).child(eventID);
+		eventReference.addListenerForSingleValueEvent(new ValueEventListener() {
+			@Override
+			public void onDataChange(DataSnapshot dataSnapshot) {
+				Event thisEvent = dataSnapshot.getValue(Event.class);
+				// load event into UI
+				loadEvent(thisEvent);
+				progress.dismiss();
+			}
+
+			@Override
+			public void onCancelled(DatabaseError databaseError) {
+
+			}
+		});
+	}
+
+	public void loadEvent(Event thisEvent){
+		eventField.setText(thisEvent.name);
+		dateField.setText(thisEvent.date);
+		timeField.setText(thisEvent.time);
+		timeSet = true;
+		dateSet = true;
 	}
 }

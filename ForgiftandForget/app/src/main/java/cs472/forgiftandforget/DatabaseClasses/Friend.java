@@ -44,6 +44,7 @@ public class Friend {
 	@Exclude
 	public static void RemoveFriend(String friendID, final DatabaseReference.CompletionListener completionListener) {
 
+		final StorageReference storageReference = FirebaseStorage.getInstance().getReference("contactImages");
 		final DatabaseReference friendsListRef = GetFriendsListsReference().child(Database.GetCurrentUID()).child(friendID);
 		friendsListRef.addListenerForSingleValueEvent(new ValueEventListener() {
 			@Override
@@ -62,7 +63,7 @@ public class Friend {
 				temp = dataSnapshot.child("imageID").getValue();
 				if (temp != null) {
 					imageID = temp.toString();
-					// ToDo remove image from database
+					storageReference.child(imageID).delete();
 				}
 				
 				if (completionListener == null) {
