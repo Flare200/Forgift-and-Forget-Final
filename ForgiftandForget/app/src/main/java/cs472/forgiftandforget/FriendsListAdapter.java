@@ -85,9 +85,10 @@ public class FriendsListAdapter extends BaseExpandableListAdapter
 	public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent)
 	{
 		String title = (String) this.getGroup(groupPosition);
-
-		LayoutInflater layoutInflater = (LayoutInflater) this.ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		convertView = layoutInflater.inflate(R.layout.parent_layout, null);
+		if(convertView == null) {
+			LayoutInflater layoutInflater = (LayoutInflater) this.ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			convertView = layoutInflater.inflate(R.layout.parent_layout, null);
+		}
 		final View convertView2 = convertView;
 
 		TextView textView = (TextView) convertView.findViewById(R.id.headingItem);
@@ -102,7 +103,7 @@ public class FriendsListAdapter extends BaseExpandableListAdapter
 						public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
 							//ImageView contactImage = (ImageView) convertView2.findViewById(R.id.imageView);
 							//contactImage.setImageURI(contactImageUri);
-							// ToDo move image loading to once, on adapter creation. 
+							// ToDo move image loading to once, on adapter creation.
 						}
 					}).addOnFailureListener(new OnFailureListener() {
 				@Override
