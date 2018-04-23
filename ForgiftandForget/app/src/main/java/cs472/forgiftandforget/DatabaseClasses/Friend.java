@@ -105,6 +105,7 @@ public class Friend {
 		newFriend.eventListID = eventListID;
 		newFriend.friendID = friendID;
 		newFriend.imageID = imageID;
+		newFriend.name = newFriend.name.toUpperCase();
 		if(contactImageUri != null) {
 			storageReference.child(imageID).putFile(contactImageUri);
 		}

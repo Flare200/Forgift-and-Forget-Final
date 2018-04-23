@@ -5,6 +5,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Patterns;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.Toast;
 import android.widget.ProgressBar;
@@ -25,6 +27,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		//this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+		//this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		setContentView(R.layout.activity_main);
 
 		progressBar = (ProgressBar) findViewById(R.id.progress);
@@ -32,7 +36,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 		passwordField = (EditText) findViewById(R.id.passwordField);
 
 		findViewById(R.id.newUserButton).setOnClickListener(this);
-		findViewById(R.id.loginButton).setOnClickListener(this);
+		findViewById(R.id.cardView).setOnClickListener(this);
 		findViewById(R.id.forgotPasswordButton).setOnClickListener(this);
 	}
 
@@ -44,7 +48,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 			case R.id.newUserButton:
 				startActivity(new Intent(MainActivity.this, AccountCreation.class));
 				break;
-			case R.id.loginButton:
+			case R.id.cardView:
 				loginClicked();
 				break;
 			case R.id.forgotPasswordButton:

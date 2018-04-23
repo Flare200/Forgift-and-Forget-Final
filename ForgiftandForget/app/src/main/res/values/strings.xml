@@ -42,4 +42,5 @@
     <string name="already_registered_login">Already Registered? Login.</string>
     <string name="update_event">Update Event</string>
     <string name="delete_event">Delete Event</string>
+    <string name="friend_image">Friend Image</string>
 </resources>

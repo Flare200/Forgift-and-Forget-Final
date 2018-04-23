@@ -156,8 +156,8 @@ public class FriendList extends AppCompatActivity {
 										{
 											subList.add(subEvent.name);
 										}
-										subList.add("~Click to add an Event~");
-										subList.add("~View Gifted List~");
+										subList.add("Add Event");
+										subList.add("Gifted List");
 
 										// add sublist into lower level expandableList
 										eventList.put(thisFriend.name, subList);
@@ -166,7 +166,7 @@ public class FriendList extends AppCompatActivity {
 
 										if (iterationCount == goalIterations) {
 											// done loading friends
-											myAdapter = new FriendsListAdapter(ctx, headerList, eventList);
+											myAdapter = new FriendsListAdapter(ctx, headerList, eventList, friends);
 											friendList.setAdapter(myAdapter);
 										}
 
