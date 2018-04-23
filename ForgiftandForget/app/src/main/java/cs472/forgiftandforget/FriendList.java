@@ -2,16 +2,28 @@ package cs472.forgiftandforget;
 
 import android.content.ClipData;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Icon;
+import android.net.Uri;
+import android.provider.MediaStore;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Editable;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.ExpandableListView;
+import android.widget.ImageView;
 import android.widget.Toast;
+
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,6 +43,11 @@ public class FriendList extends AppCompatActivity {
 	private Context ctx = this;
 	private ExpandableListView friendList;
 	private FriendsListAdapter myAdapter;
+	static final int GALLERY = 1;
+	Uri contactImageUri;
+	ImageView contactImage;
+	EditText contactName;
+	View dialogView;
 
 	Database database;
 	private static final Object friendLock = new Object();
@@ -237,13 +254,79 @@ public class FriendList extends AppCompatActivity {
 		}
 	}
 
+	// add friend now done completely through a dialoge
 	private void addFriend()
 	{
-		Intent friendIntent = new Intent(ctx, FriendCreation.class);
-		// send option so activity knows this is an add, and not edit
-		friendIntent.putExtra("option", 0);
-		finish();
-		startActivity(friendIntent);
+		// create a new dialog, set the layout
+		AlertDialog.Builder addFriendDialog = new AlertDialog.Builder(this);
+		LayoutInflater inflater = LayoutInflater.from(this);
+		final View dialogView = inflater.inflate(R.layout.add_friend_dialogue, null);
+
+		// get reference to the dialoge image and edit text
+		contactImage = (ImageView) dialogView.findViewById(R.id.dialog_imageview);
+		contactName = (EditText) dialogView.findViewById(R.id.dialog_edittext);
+
+		// if image was previously loaded here, reload it
+		// (if user entered no name, and function was called again)
+		if(contactImageUri != null){
+			Bitmap bitmap;
+			try {
+				bitmap = BitmapFactory.decodeStream(getContentResolver().openInputStream(contactImageUri));
+				contactImage.setImageBitmap(bitmap);
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			}
+		}
+		// set listener for imageView, to open gallery intent
+		dialogView.findViewById(R.id.dialog_imageview).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent gallery = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
+				gallery.putExtra(MediaStore.EXTRA_OUTPUT, contactImageUri);
+				startActivityForResult(gallery, GALLERY);
+			}
+		});
+
+		addFriendDialog.setTitle("Add Friend");
+
+		// add friend to database
+		addFriendDialog.setPositiveButton("ADD", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dlg, int which) {
+						// check length of name, if 0 toast and re-dialogue
+						final String newName = contactName.getText().toString().trim();
+						if(newName.length() == 0){
+							Toast.makeText(getApplicationContext(), "Please add a name first", Toast.LENGTH_LONG).show();
+							addFriend();
+						}else {
+							final Friend newFriend = new Friend(newName);
+							// listener for database completion
+							DatabaseReference.CompletionListener listener = new DatabaseReference.CompletionListener() {
+								@Override
+								public void onComplete(DatabaseError error, DatabaseReference ref) {
+									if (error != null) {
+										//error, notify user and do nothing.
+										Toast.makeText(getApplicationContext(), "Unable to add Friend. Please try again.", Toast.LENGTH_LONG).show();
+									} else {
+										// completed successfully
+										Event.GetEventListsReference().child(newFriend.eventListID).setValue(".");
+
+										// UI things
+										Toast.makeText(getApplicationContext(), newName.toUpperCase() + " Added to Friends List.", Toast.LENGTH_LONG).show();
+										Intent reloadIntent = new Intent(ctx, FriendList.class);
+										finish();
+										startActivity(reloadIntent);
+									}
+								}
+							};
+							// add friend to database, wait for completion
+							Friend.AddFriend(newFriend, contactImageUri, listener);
+						}
+					}
+				});
+
+		addFriendDialog.setNegativeButton("Cancel", null);
+		addFriendDialog.setView(dialogView);
+		addFriendDialog.show();
 	}
 
 	private void addEvent(Friend currentFriend)
@@ -271,6 +354,23 @@ public class FriendList extends AppCompatActivity {
 		finish();
 		Intent intent = new Intent(ctx, MainActivity.class);
 		startActivity(intent);
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+
+
+		if (requestCode == GALLERY && resultCode == RESULT_OK) {
+			contactImageUri = data.getData();
+			Bitmap bitmap;
+			try {
+				bitmap = BitmapFactory.decodeStream(getContentResolver().openInputStream(contactImageUri));
+				contactImage.setImageBitmap(bitmap);
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 

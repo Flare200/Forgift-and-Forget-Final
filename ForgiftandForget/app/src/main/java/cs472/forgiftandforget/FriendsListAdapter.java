@@ -94,6 +94,7 @@ public class FriendsListAdapter extends BaseExpandableListAdapter
 		TextView textView = (TextView) convertView.findViewById(R.id.headingItem);
 		textView.setTypeface(null, Typeface.BOLD);
 		textView.setText(title);
+		/*
 		try {
 			File contactImageFile = File.createTempFile("images" + groupPosition, "jpg");
 			final Uri contactImageUri = Uri.parse(contactImageFile.getAbsolutePath());
@@ -114,6 +115,7 @@ public class FriendsListAdapter extends BaseExpandableListAdapter
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		*/
 		return convertView;
 	}
 
