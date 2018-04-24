@@ -8,8 +8,8 @@
 
     <ImageView
         android:id="@+id/imageView"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         android:layout_gravity="start"
         android:contentDescription="@string/friend_image"
         app:srcCompat="@drawable/ic_blank_friend" />

@@ -9,13 +9,13 @@
 
     <ImageView
         android:id="@+id/logo"
-        android:layout_width="120dp"
-        android:layout_height="150dp"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
         android:layout_above="@+id/emailField"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="15dp"
         android:contentDescription="logo"
-        app:srcCompat="@drawable/present" />
+        app:srcCompat="@drawable/fflogosmall" />
 
     <EditText
         android:id="@+id/emailField"

@@ -21,6 +21,7 @@ public class Friend {
 	public String eventListID;
 	public String imageID;
 	public boolean hasEvents;
+	public Uri contactImage;
 
 	public Friend() {
 		// need public empty constructor for firebase
@@ -33,6 +34,7 @@ public class Friend {
 		this.imageID = "null";
 		this.eventListID = "null";
 		this.hasEvents = false;
+		this.contactImage = null;
 	}
 
 

@@ -2,8 +2,8 @@ package cs472.forgiftandforget;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
-import android.content.ClipData;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -13,16 +13,15 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.Icon;
 import android.net.Uri;
 import android.provider.CalendarContract;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.Editable;
 import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -40,18 +39,28 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.TimeZone;
+import java.util.concurrent.CopyOnWriteArrayList;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FileDownloadTask;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import cs472.forgiftandforget.DatabaseClasses.Database;
 import cs472.forgiftandforget.DatabaseClasses.Event;
@@ -91,6 +100,7 @@ public class FriendList extends AppCompatActivity implements AdapterView.OnItemS
 	private static final Object friendLock = new Object();
 	final ArrayList<Friend> friends = new ArrayList<>();
 	final ArrayList<ArrayList<Event>> friendsEvents = new ArrayList<>();
+	final CopyOnWriteArrayList<Uri> contactImages = new CopyOnWriteArrayList<>();
 	private static int iterationCount;
 	DatabaseReference friendsListReference;
 
@@ -110,6 +120,12 @@ public class FriendList extends AppCompatActivity implements AdapterView.OnItemS
 	    year = cal.get(Calendar.YEAR);
 	    month = cal.get(Calendar.MONTH);
 	    day = cal.get(Calendar.DAY_OF_MONTH);
+
+	    final ProgressDialog progress = new ProgressDialog(this);
+	    progress.setTitle("Loading Friends");
+	    progress.setMessage("Loading...");
+	    progress.setCancelable(false); // disable dismiss by tapping outside of the dialog
+	    progress.show();
 
 		friendList = (ExpandableListView) findViewById(R.id.listView);
 		friendList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
@@ -195,7 +211,6 @@ public class FriendList extends AppCompatActivity implements AdapterView.OnItemS
 										Iterable<DataSnapshot> Children = dataSnapshot.getChildren();
 
 										// Get all events and adding to the list events,
-										// Except for the null Event (which is added on Friend creation to hold Database spot)
 										ArrayList<Event> events = new ArrayList<Event>();
 										for (DataSnapshot Child : Children)
 										{
@@ -225,14 +240,40 @@ public class FriendList extends AppCompatActivity implements AdapterView.OnItemS
 
 										//If each event list for each friend is populated (aka, this is
 
-										if (iterationCount == goalIterations) {
-											// done loading friends
-											myAdapter = new FriendsListAdapter(ctx, headerList, eventList, friends);
-											friendList.setAdapter(myAdapter);
-										}
+										StorageReference storageReference = FirebaseStorage.getInstance().getReference("contactImages");
+										try {
+											synchronized(friendLock) {
+												File contactImageFile = File.createTempFile("images" + thisFriend.imageID, "jpg");
+												final Uri contactImageUri = Uri.parse(contactImageFile.getAbsolutePath());
+												storageReference.child(thisFriend.imageID).getFile(contactImageFile)
+														.addOnCompleteListener(new OnCompleteListener<FileDownloadTask.TaskSnapshot>() {
+															@Override
+															public void onComplete(@NonNull Task<FileDownloadTask.TaskSnapshot> task) {
 
-										//increment the added EventList count
-										iterationCount++;
+																if (iterationCount == goalIterations) {
+																	// done loading friends
+																	myAdapter = new FriendsListAdapter(ctx, headerList, eventList, friends);
+																	friendList.setAdapter(myAdapter);
+																	progress.dismiss();
+																}
+																//increment the added EventList count
+																iterationCount++;
+															}
+														}).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+													@Override
+													public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+														thisFriend.contactImage = contactImageUri;
+													}
+												}).addOnFailureListener(new OnFailureListener() {
+													@Override
+													public void onFailure(@NonNull Exception e) {
+														// no image, or image download failed
+													}
+												});
+											}
+										} catch (IOException e) {
+											e.printStackTrace();
+										}
 									}
 								}
 
@@ -364,6 +405,8 @@ public class FriendList extends AppCompatActivity implements AdapterView.OnItemS
 							};
 							// add friend to database, wait for completion
 							Friend.AddFriend(newFriend, contactImageUri, listener);
+							// set friends contact image
+							newFriend.contactImage = contactImageUri;
 						}
 					}
 				});
