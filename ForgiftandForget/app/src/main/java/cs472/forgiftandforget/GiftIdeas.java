@@ -8,29 +8,39 @@ import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.CardView;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
-
+import com.google.firebase.storage.FileDownloadTask;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 
 import cs472.forgiftandforget.DatabaseClasses.Gift;
 
-public class GiftIdeas extends AppCompatActivity {
+public class GiftIdeas extends AppCompatActivity implements View.OnClickListener{
 
 	ImageView photo[] = new ImageView[3];
-	Button photoButton;
-	Bitmap defaultBitmap = null;
-	TextView nameField;
+	TextView urlField;
 	EditText notesField;
-	Uri imageUri;
+	CardView saveGift;
+	CardView giveGift;
+	CardView visitURL;
+	Uri images[];
 	String friendID;  // will need this later for sending to gifted list
 	String giftID;
 	Gift thisGift;
@@ -45,46 +55,43 @@ public class GiftIdeas extends AppCompatActivity {
 		friendID = getIntent().getStringExtra("friendID");
 		giftID = getIntent().getStringExtra("giftID");
 		giftReference = Gift.GetGiftsReference().child(giftID);
-		nameField = (TextView) findViewById(R.id.giftIdeaName);
 		notesField = (EditText) findViewById(R.id.giftIdeaNotes);
+		urlField = (TextView) findViewById(R.id.url);
+		saveGift = (CardView) findViewById(R.id.saveGift);
+		giveGift = (CardView) findViewById(R.id.giveGift);
+		visitURL = (CardView) findViewById(R.id.visitURL);
+		urlField = (TextView) findViewById(R.id.url);
+		saveGift.setOnClickListener(this);
+		images = new Uri[3];
 
-		photoButton = (Button) findViewById(R.id.giftPhotoButtonGallery);
 		photo[0] = (ImageView) findViewById(R.id.giftPhoto1);
 		photo[1] = (ImageView) findViewById(R.id.giftPhoto2);
 		photo[2] = (ImageView) findViewById(R.id.giftPhoto3);
-		photo[0].setImageBitmap(null);
-		photo[1].setImageBitmap(null);
-		photo[2].setImageBitmap(null);
-		photoButton.setOnClickListener(new Button.OnClickListener() {
-
-			@Override
-			public void onClick(View arg0) {
-				// TODO Auto-generated method stub
-				Intent intent = new Intent(Intent.ACTION_PICK,
-						android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-				startActivityForResult(intent, 0);
-			}
-		});
+		// set listeners for each image view
+		for(int i = 0; i < photo.length; i++ ) {
+			final int loc = i;
+			photo[loc].setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					Intent intent = new Intent(Intent.ACTION_PICK,
+							android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+					startActivityForResult(intent, loc);
+				}
+			});
+		}
 
 		giftReference.addListenerForSingleValueEvent(new ValueEventListener() {
 			@Override
 			public void onDataChange(DataSnapshot dataSnapshot) {
 				thisGift = dataSnapshot.getValue(Gift.class);
 				loadGift();
+				// ToDo get images downloaded. im having trouble with this part.
 			}
-
 			@Override
 			public void onCancelled(DatabaseError databaseError) {
 
 			}
 		});
-
-
-	}
-
-	private void openGallery() {
-		Intent gallery = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
-		startActivityForResult(gallery, PICK_IMAGE);
 	}
 
 	@Override
@@ -97,12 +104,15 @@ public class GiftIdeas extends AppCompatActivity {
 			Bitmap bitmap;
 			try {
 				bitmap = BitmapFactory.decodeStream(getContentResolver().openInputStream(targetUri));
-				if (defaultBitmap == ((BitmapDrawable) photo[0].getDrawable()).getBitmap()) {
+				if (requestCode == 0) {
 					photo[0].setImageBitmap(bitmap);
-				} else if (defaultBitmap == ((BitmapDrawable) photo[1].getDrawable()).getBitmap()) {
+					images[0] = targetUri;
+				} else if (requestCode == 1) {
 					photo[1].setImageBitmap(bitmap);
-				} else if (defaultBitmap == ((BitmapDrawable) photo[2].getDrawable()).getBitmap()) {
+					images[1] = targetUri;
+				} else if (requestCode == 2) {
 					photo[2].setImageBitmap(bitmap);
+					images[2] = targetUri;
 				}
 			} catch (FileNotFoundException e) {
 				// TODO Auto-generated catch block
@@ -112,7 +122,45 @@ public class GiftIdeas extends AppCompatActivity {
 	}
 
 	public void loadGift(){
-		nameField.setText(thisGift.name);
+		setTitle(thisGift.name);
 		notesField.setText(thisGift.description);
 	}
+
+	// switch statement to handle all button clicks by id
+	@Override
+	public void onClick(View view) {
+		switch (view.getId()) {
+			case R.id.url:
+				// do url edit, maybe dialog
+				// ToDO edit url dialog
+				break;
+			case R.id.saveGift:
+				//update gift in db
+				updateGift();
+				break;
+			case R.id.giveGift:
+				// send to gifted list
+				// ToDO send to gifted list
+				break;
+			case R.id.visitURL:
+				// open url
+				// ToDo open url externally
+				break;
+		}
+	}
+
+
+	public void updateGift(){
+		thisGift.addImages(images);
+		thisGift.description = notesField.getText().toString().trim();
+		thisGift.url = urlField.getText().toString().trim();
+		thisGift.updateGift(giftID);
+	}
+
+	public void loadImages(){
+
+	}
+
+
+
 }

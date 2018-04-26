@@ -34,6 +34,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -72,6 +73,7 @@ public class FriendList extends AppCompatActivity implements AdapterView.OnItemS
 	private FriendsListAdapter myAdapter;
 	static final int GALLERY = 1;
 	Uri contactImageUri;
+	EditText contactName;
 	ImageView contactImage;
 	EditText eventName;
 	EditText eventDate;
@@ -141,30 +143,14 @@ public class FriendList extends AppCompatActivity implements AdapterView.OnItemS
 					switch (type) {
 						case ExpandableListView.PACKED_POSITION_TYPE_GROUP: {
 							//if friend long clicked
-							// ToDo send to edit friend
-							Intent friendEditIntent = new Intent(ctx, FriendCreation.class);
-							// set option so the activity knows this is an edit, instead of create
-							friendEditIntent.putExtra("option", 1);
-							// send friendID to edit
-							friendEditIntent.putExtra("friendID", friends.get(friendPosition).friendID);
-							finish();
-							startActivity(friendEditIntent);
-
+							editFriend(friendPosition);
 							return true;
 						}
 						case ExpandableListView.PACKED_POSITION_TYPE_CHILD: {
 							// if event item clicked
 							// ToDo have an edit event option maybe? will need to verify they didnt click ~add event~
 							if(eventPosition < friendsEvents.get(friendPosition).size()){
-								Intent eventEditIntent = new Intent(ctx, EventCreation.class);
-								// set option so the activity knows this is an edit, instead of create
-								eventEditIntent.putExtra("option", 1);
-								// send event to edit
-								eventEditIntent.putExtra("eventID", friendsEvents.get(friendPosition).get(eventPosition).eventID);
-								eventEditIntent.putExtra("ELID", friends.get(friendPosition).eventListID);
-								eventEditIntent.putExtra("FID", friends.get(friendPosition).friendID);
-								finish();
-								startActivity(eventEditIntent);
+								editEvent(friendPosition, eventPosition);
 							}
 							return true;
 						}
@@ -349,7 +335,7 @@ public class FriendList extends AppCompatActivity implements AdapterView.OnItemS
 
 		// get reference to the dialoge image and edit text
 		contactImage = (ImageView) dialogView.findViewById(R.id.dialog_imageview);
-		final EditText contactName = (EditText) dialogView.findViewById(R.id.dialog_edittext);
+		contactName = (EditText) dialogView.findViewById(R.id.dialog_edittext);
 
 		// if image was previously loaded here, reload it
 		// (if user entered no name, and function was called again)
@@ -457,35 +443,7 @@ public class FriendList extends AppCompatActivity implements AdapterView.OnItemS
 		}else {
 			reminder = (Spinner) dialogView.findViewById(R.id.reminderSpinner);
 		}
-
-		// set up spinner adapter to allow a hint
-		final ArrayAdapter<String> adapter = new ArrayAdapter<String>(FriendList.this, android.R.layout.simple_spinner_dropdown_item) {
-			@Override
-			public View getView(int position, View convertView, ViewGroup parent) {
-
-				View v = super.getView(position, convertView, parent);
-				if (position == getCount()) {
-					((TextView)v.findViewById(android.R.id.text1)).setText("");
-					((TextView)v.findViewById(android.R.id.text1)).setHint(getItem(getCount())); // Hint to be displayed
-				}
-				return v;
-			}
-			@Override
-			public int getCount() {
-				return super.getCount()-1; // wont display last item. It is used as hint.
-			}
-		};
-		// populate spinner choices
-		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		adapter.add(reminderStrings[0]);
-		adapter.add(reminderStrings[1]);
-		adapter.add(reminderStrings[2]);
-		adapter.add(reminderStrings[3]);
-		adapter.add(reminderStrings[4]);
-		adapter.add(reminderStrings[5]);
-		reminder.setAdapter(adapter);
-		reminder.setSelection(adapter.getCount());
-		reminder.setOnItemSelectedListener(FriendList.this);
+		setUpSpinner();
 
 		// update reminder AFTER adapter is set, if this is a re-dialogue
 		if(oldReminder != -1){
@@ -503,8 +461,6 @@ public class FriendList extends AppCompatActivity implements AdapterView.OnItemS
 				final String thisEventname = eventName.getText().toString().trim();
 
 				// disallow any user input to date and time fields
-				eventDate.setInputType(InputType.TYPE_NULL);
-				eventTime.setInputType(InputType.TYPE_NULL);
 
 				// add the event after error checking fields
 				if(eventName.getText().toString().trim().length() == 0){
@@ -526,35 +482,7 @@ public class FriendList extends AppCompatActivity implements AdapterView.OnItemS
 			}
 		});
 
-		// listeners to open date and time dialogs
-		eventDate.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				showDialog(DATE_PICK);
-			}
-		});
-		eventDate.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-			@Override
-			public void onFocusChange(View v, boolean hasFocus) {
-				if (hasFocus) {
-					showDialog(DATE_PICK);
-				}
-			}
-		});
-		eventTime.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				showDialog(TIME_PICK);
-			}
-		});
-		eventTime.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-			@Override
-			public void onFocusChange(View v, boolean hasFocus) {
-				if (hasFocus) {
-					showDialog(TIME_PICK);
-				}
-			}
-		});
+		setDateTimeListeners();
 
 		// cancel was pressed, reset all fields
 		addEventDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -563,7 +491,8 @@ public class FriendList extends AppCompatActivity implements AdapterView.OnItemS
 				eventName.setText("");
 				eventDate.setText("");
 				eventTime.setText("");
-				reminder.setSelection(adapter.getCount());
+				setUpSpinner();
+
 			}
 		});
 
@@ -771,6 +700,224 @@ public class FriendList extends AppCompatActivity implements AdapterView.OnItemS
 		Intent intent = new Intent(FriendList.this, FriendList.class);
 		finish();
 		startActivity(intent);
+	}
+
+	public void editFriend(final int friendPosition){
+		AlertDialog.Builder editFriendAlert = new AlertDialog.Builder(this);
+		LayoutInflater inflater = LayoutInflater.from(this);
+		final View dialogView = inflater.inflate(R.layout.add_friend_dialogue, null);
+		contactName = (EditText) dialogView.findViewById(R.id.dialog_edittext);
+		contactImage = (ImageView) dialogView.findViewById(R.id.dialog_imageview);
+		contactName.setText(friends.get(friendPosition).name);
+		contactImage.setImageURI(friends.get(friendPosition).contactImage);
+		dialogView.findViewById(R.id.dialog_imageview).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent gallery = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
+				gallery.putExtra(MediaStore.EXTRA_OUTPUT, contactImageUri);
+				startActivityForResult(gallery, GALLERY);
+			}
+		});
+		editFriendAlert.setNegativeButton("Cancel", null);
+		editFriendAlert.setPositiveButton("Update", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				if(contactName.getText().toString().trim().length() == 0){
+					Toast.makeText(getApplicationContext(), "Please add a name first", Toast.LENGTH_LONG).show();
+					editFriend(friendPosition);
+					return;
+				}
+				final ProgressBar progressBar = (ProgressBar) dialogView.findViewById(R.id.progress);
+				progressBar.setVisibility(View.VISIBLE);
+				friendsListReference = Friend.GetFriendsListsReference().child(Database.GetCurrentUID()).child(friends.get(friendPosition).friendID);
+				friendsListReference.addListenerForSingleValueEvent(new ValueEventListener() {
+					@Override
+					public void onDataChange(DataSnapshot dataSnapshot) {
+						Friend thisFriend = dataSnapshot.getValue(Friend.class);
+						thisFriend.name = contactName.getText().toString().trim();
+						thisFriend.updateFriend(contactImageUri);
+						progressBar.setVisibility(View.GONE);
+						reloadFriendsList();
+					}
+					@Override
+					public void onCancelled(DatabaseError databaseError) {
+
+					}
+				});
+			}
+		});
+		editFriendAlert.setNeutralButton("Delete", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				deleteFriend(dialogView, friendPosition);
+			}
+		});
+
+
+		editFriendAlert.setTitle("Update Friend");
+		editFriendAlert.setView(dialogView);
+		editFriendAlert.show();
+	}
+
+	public void deleteFriend(View view, final int friendPosition)
+	{
+		AlertDialog.Builder builder = new AlertDialog.Builder(FriendList.this);
+		builder.setMessage("Permanently delete " + contactName.getText() + "?");
+		builder.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				removeFriend(friendPosition);
+			}
+		});
+		builder.setNegativeButton("Cancel", null);
+
+		AlertDialog alert = builder.create();
+		alert.show();
+	}
+
+	public void removeFriend(int friendPosition){
+		Toast.makeText(getApplicationContext(), "Removed " + contactName.getText() + " from Friends List.", Toast.LENGTH_LONG).show();
+
+		//create a new listener for AddFriend
+		DatabaseReference.CompletionListener completionListener = new DatabaseReference.CompletionListener() {
+			@Override
+			public void onComplete(DatabaseError error, DatabaseReference ref) {
+				if (error != null) {
+					//error, notify user and do nothing.
+					Toast.makeText(getApplicationContext(), "Unable to delete Friend. Please try again.", Toast.LENGTH_LONG).show();
+				} else {
+					// completed successfully
+					finish();
+					reloadFriendsList();
+				}
+			}
+		};
+		Friend.RemoveFriend(friends.get(friendPosition).friendID, completionListener);
+	}
+
+
+	public void editEvent(final int friendPosition, int eventPosition){
+		AlertDialog.Builder editEventAlert = new AlertDialog.Builder(this);
+		LayoutInflater inflater = LayoutInflater.from(this);
+		final View dialogView = inflater.inflate(R.layout.add_event_dialogue, null);
+		editEventAlert.setMessage("Update Event");
+		eventName = (EditText) dialogView.findViewById(R.id.event);
+		eventDate = (EditText) dialogView.findViewById(R.id.date);
+		eventTime = (EditText) dialogView.findViewById(R.id.time);
+		reminder = (Spinner) dialogView.findViewById(R.id.reminderSpinner);
+		final Event thisEvent = friendsEvents.get(friendPosition).get(eventPosition);
+		eventName.setText(thisEvent.name);
+		eventDate.setText(thisEvent.date);
+		eventTime.setText(thisEvent.time);
+		timeSet = true;
+		dateSet = true;
+		setDateTimeListeners();
+		setUpSpinner();
+		editEventAlert.setPositiveButton("Update", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				thisEvent.setName(eventName.getText().toString().trim());
+				thisEvent.setDate(eventDate.getText().toString().trim());
+				thisEvent.setTime(eventTime.getText().toString().trim());
+				Event.UpdateEvent(friends.get(friendPosition).eventListID, thisEvent);
+				checkPermissions();
+			}
+		});
+		editEventAlert.setNeutralButton("Delete", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				deleteEvent(thisEvent.getEventID(), friends.get(friendPosition).eventListID);
+
+			}
+		});
+		editEventAlert.setNegativeButton("Cancel", null);
+		editEventAlert.setView(dialogView);
+		editEventAlert.show();
+
+
+	}
+
+	public void deleteEvent(final String eventID, final String eventListID){
+		// ask user to verify deletion
+		AlertDialog.Builder builder = new AlertDialog.Builder(FriendList.this);
+		builder.setMessage("Permanently delete this Event,\nand all of its Gifts?");
+		builder.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				// remove event from database
+				Event.RemoveSingleEvent(eventID, eventListID);
+				reloadFriendsList();
+			}
+		});
+		builder.setNegativeButton("Cancel", null);
+
+		AlertDialog alert = builder.create();
+		alert.show();
+	}
+
+	public void setDateTimeListeners(){
+		// listeners to open date and time dialogs
+		eventDate.setInputType(InputType.TYPE_NULL);
+		eventTime.setInputType(InputType.TYPE_NULL);
+		eventDate.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				showDialog(DATE_PICK);
+			}
+		});
+		eventDate.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+			@Override
+			public void onFocusChange(View v, boolean hasFocus) {
+				if (hasFocus) {
+					showDialog(DATE_PICK);
+				}
+			}
+		});
+		eventTime.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				showDialog(TIME_PICK);
+			}
+		});
+		eventTime.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+			@Override
+			public void onFocusChange(View v, boolean hasFocus) {
+				if (hasFocus) {
+					showDialog(TIME_PICK);
+				}
+			}
+		});
+	}
+
+	public void setUpSpinner(){
+		// set up spinner adapter to allow a hint
+		final ArrayAdapter<String> adapter = new ArrayAdapter<String>(FriendList.this, android.R.layout.simple_spinner_dropdown_item) {
+			@Override
+			public View getView(int position, View convertView, ViewGroup parent) {
+
+				View v = super.getView(position, convertView, parent);
+				if (position == getCount()) {
+					((TextView)v.findViewById(android.R.id.text1)).setText("");
+					((TextView)v.findViewById(android.R.id.text1)).setHint(getItem(getCount())); // Hint to be displayed
+				}
+				return v;
+			}
+			@Override
+			public int getCount() {
+				return super.getCount()-1; // wont display last item. It is used as hint.
+			}
+		};
+		// populate spinner choices
+		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		adapter.add(reminderStrings[0]);
+		adapter.add(reminderStrings[1]);
+		adapter.add(reminderStrings[2]);
+		adapter.add(reminderStrings[3]);
+		adapter.add(reminderStrings[4]);
+		adapter.add(reminderStrings[5]);
+		reminder.setAdapter(adapter);
+		reminder.setSelection(adapter.getCount());
+		reminder.setOnItemSelectedListener(FriendList.this);
 	}
 
 }

@@ -29,6 +29,13 @@ public class Event {
 		this.eventID = "null";
 	}
 
+	public Event(String name, String date, String time, String eventID) {
+		this.name = name;
+		this.date = date;
+		this.time = time;
+		this.eventID = eventID;
+	}
+
 	@Exclude
 	public static DatabaseReference GetEventListsReference() {
 		return FirebaseDatabase.getInstance().getReference("EventLists");
@@ -166,6 +173,37 @@ public class Event {
 				//do nothing
 			}
 		});
+	}
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getDate() {
+		return date;
+	}
+
+	public void setDate(String date) {
+		this.date = date;
+	}
+
+	public String getEventID() {
+		return eventID;
+	}
+
+	public void setEventID(String eventID) {
+		this.eventID = eventID;
+	}
+
+	public String getTime() {
+		return time;
+	}
+
+	public void setTime(String time) {
+		this.time = time;
 	}
 
 }

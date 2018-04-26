@@ -1,11 +1,15 @@
 package cs472.forgiftandforget.DatabaseClasses;
 
+import android.net.Uri;
+
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Exclude;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 /**
  * Created by Tristan on 3/15/2018.
@@ -15,7 +19,9 @@ public class Gift
 {
 	public String name;
 	public String description;
-	public String imageID;
+	public String imageID1;
+	public String imageID2;
+	public String imageID3;
 	public String url;
 	public boolean gifted;
 
@@ -27,7 +33,9 @@ public class Gift
 		this.name = name;
 		this.description = "";
 		this.url = "";
-		this.imageID = "";
+		this.imageID1 = "";
+		this.imageID2 = "";
+		this.imageID3 = "";
 		this.gifted = false;
 	}
 
@@ -63,12 +71,14 @@ public class Gift
 		DatabaseReference newGiftRef = giftListRef.push();
 		newGiftRef.setValue(".");
 		final String giftIdKey = newGiftRef.getKey();
+		giftToAdd.imageID1 = newGiftRef.push().getKey();
+		giftToAdd.imageID2 = newGiftRef.push().getKey();
+		giftToAdd.imageID3 = newGiftRef.push().getKey();
 
 		// this was overwriting the first gift every time
 		// giftsRef.setValue(giftIdKey);
 
 		giftsRef.child(giftIdKey).setValue(giftToAdd);
-
 	}
 
 	@Exclude
@@ -88,6 +98,28 @@ public class Gift
 
 			}
 		});
+	}
+
+	@Exclude
+	public void addImages(Uri[] images) {
+		final StorageReference storageReference = FirebaseStorage.getInstance().getReference("giftImages");
+		if(images[0] != null) {
+			storageReference.child(imageID1).putFile(images[0]);
+		}
+		if(images[1] != null){
+			storageReference.child(imageID2).putFile(images[1]);
+		}
+		if(images[1] != null){
+			storageReference.child(imageID3).putFile(images[2]);
+		}
+	}
+
+	@Exclude
+	public void updateGift(String giftID) {
+		DatabaseReference giftsRef = GetGiftsReference().child(giftID);
+		giftsRef.setValue(this);
+
+
 	}
 
 }
