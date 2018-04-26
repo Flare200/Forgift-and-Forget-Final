@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
@@ -85,7 +86,35 @@ public class GiftIdeas extends AppCompatActivity implements View.OnClickListener
 			public void onDataChange(DataSnapshot dataSnapshot) {
 				thisGift = dataSnapshot.getValue(Gift.class);
 				loadGift();
-				// ToDo get images downloaded. im having trouble with this part.
+				StorageReference storageReference = FirebaseStorage.getInstance().getReference("giftImages");
+				for (int i = 0; i < photo.length; i++) {
+					String currentImageID = "";
+					final int loc = i;
+					switch(loc){
+						case 0:currentImageID = thisGift.imageID1;break;
+						case 1:currentImageID = thisGift.imageID2;break;
+						case 2:currentImageID = thisGift.imageID3;break;
+					}
+					try {
+						File giftImageFile = File.createTempFile("images", "jpg");
+						final Uri contactImageUri = Uri.parse(giftImageFile.getAbsolutePath());
+						storageReference.child(currentImageID).getFile(giftImageFile)
+								.addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+									@Override
+									public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+										photo[loc].setImageURI(contactImageUri);
+									}
+								}).addOnFailureListener(new OnFailureListener() {
+							@Override
+							public void onFailure(@NonNull Exception e) {
+
+							}
+						});
+					} catch (IOException e) {
+						e.printStackTrace();
+
+					}
+				}
 			}
 			@Override
 			public void onCancelled(DatabaseError databaseError) {
