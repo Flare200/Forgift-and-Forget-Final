@@ -51,7 +51,6 @@ public class IdeaPage extends AppCompatActivity
 		eventName = getIntent().getStringExtra("eventName");
 		giftListReference = Gift.GetGiftListsReference().child(eventID);
 		ideaListView = (ListView) findViewById(R.id.ideaList);
-		//ideaListView = new ListView(IdeaPage.this);
 		setTitle(eventName);
 		ideaListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
@@ -59,7 +58,6 @@ public class IdeaPage extends AppCompatActivity
 				Intent giftIntent = new Intent(IdeaPage.this, GiftIdeas.class);
 				giftIntent.putExtra("giftID", giftIDS.get(position));
 				giftIntent.putExtra("friendID", friendID);
-				finish();
 				startActivity(giftIntent);
 			}
 		});
@@ -84,17 +82,14 @@ public class IdeaPage extends AppCompatActivity
 				for (int i = 0; i < giftIDS.size(); i++)
 				{
 					final int loc = i;
-					DatabaseReference giftReference = Gift.GetGiftsReference();
+					DatabaseReference giftReference = Gift.GetGiftsReference().child(giftIDS.get(i));
 					giftReference.addListenerForSingleValueEvent(new ValueEventListener()
 					{
 						@Override
 						public void onDataChange(DataSnapshot dataSnapshot)
 						{
 							Gift newGift = new Gift();
-							newGift.name = dataSnapshot.child(giftIDS.get(loc)).child("name").getValue(String.class);
-							newGift.description = dataSnapshot.child(giftIDS.get(loc)).child("description").getValue(String.class);
-							newGift.url = dataSnapshot.child(giftIDS.get(loc)).child("url").getValue(String.class);
-							newGift.imageID = dataSnapshot.child(giftIDS.get(loc)).child("imageID").getValue(String.class);
+							newGift = dataSnapshot.getValue(Gift.class);
 							gifts.add(newGift);
 
 							if(loc == giftIDS.size()-1)
@@ -105,7 +100,7 @@ public class IdeaPage extends AppCompatActivity
 									headerList.add(gifts.get(i).name);
 								}
 								// gifts loaded, set adapter
-								ArrayAdapter<String> ideaPageAdapter = new ArrayAdapter<String>(IdeaPage.this, android.R.layout.simple_list_item_1,headerList);
+								ArrayAdapter<String> ideaPageAdapter = new ArrayAdapter<String>(IdeaPage.this, R.layout.idea_layout,headerList);
 								ideaListView.setAdapter(ideaPageAdapter);
 							}
 
@@ -154,7 +149,7 @@ public class IdeaPage extends AppCompatActivity
 
 	private void addNewGift()
 	{
-		// ToDo need an activity for adding gifts and a button to do so, similar to adding friends
+		// ToDo make into dialog
 		Intent intentIdeaCreation = new Intent(IdeaPage.this, IdeaCreation.class);
 		intentIdeaCreation.putExtra("friendID",friendID);
 		intentIdeaCreation.putExtra("eventID",eventID);

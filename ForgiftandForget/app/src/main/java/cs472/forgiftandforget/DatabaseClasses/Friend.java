@@ -21,6 +21,7 @@ public class Friend {
 	public String eventListID;
 	public String imageID;
 	public boolean hasEvents;
+	public Uri contactImage;
 
 	public Friend() {
 		// need public empty constructor for firebase
@@ -33,6 +34,7 @@ public class Friend {
 		this.imageID = "null";
 		this.eventListID = "null";
 		this.hasEvents = false;
+		this.contactImage = null;
 	}
 
 
@@ -105,6 +107,7 @@ public class Friend {
 		newFriend.eventListID = eventListID;
 		newFriend.friendID = friendID;
 		newFriend.imageID = imageID;
+		newFriend.name = newFriend.name.toUpperCase();
 		if(contactImageUri != null) {
 			storageReference.child(imageID).putFile(contactImageUri);
 		}

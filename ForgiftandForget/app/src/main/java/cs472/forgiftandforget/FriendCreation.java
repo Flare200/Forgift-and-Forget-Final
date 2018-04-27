@@ -142,7 +142,7 @@ public class FriendCreation extends AppCompatActivity implements View.OnClickLis
 					Event.GetEventListsReference().child(newFriend.eventListID).setValue(".");
 
 					//UI things
-					Toast.makeText(getApplicationContext(), newName + " Added to Friends List.", Toast.LENGTH_LONG).show();
+					Toast.makeText(getApplicationContext(), newName.toUpperCase() + " Added to Friends List.", Toast.LENGTH_LONG).show();
 					finish();
 					startActivity(intent);
 				}

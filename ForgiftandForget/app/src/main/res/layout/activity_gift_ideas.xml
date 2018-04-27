@@ -1,76 +1,188 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/gradient1"
     tools:context="cs472.forgiftandforget.GiftIdeas">
-
-    <Button
-        android:id="@+id/giftPhotoButtonGallery"
-        android:layout_width="162dp"
-        android:layout_height="59dp"
-        android:layout_marginLeft="28dp"
-        android:layout_marginTop="204dp"
-        android:text="@string/giftIdeaGallery"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/giftPhoto1" />
-
-    <ImageView
-        android:id="@+id/giftPhoto1"
-        android:layout_width="142dp"
-        android:layout_height="135dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginStart="28dp"
-        android:layout_marginTop="20dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/giftIdeaName"
-        app:srcCompat="@android:drawable/screen_background_light_transparent" />
-
-    <ImageView
-        android:id="@+id/giftPhoto2"
-        android:layout_width="144dp"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="136dp"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="20dp"
-        app:layout_constraintStart_toEndOf="@+id/giftPhoto1"
-        app:layout_constraintTop_toBottomOf="@+id/giftIdeaName"
-        app:srcCompat="@android:drawable/screen_background_light_transparent" />
+        android:weightSum="10"
+        android:id="@+id/imageLinear">
+        <ImageView
+            android:id="@+id/giftPhoto1"
+            android:layout_width="0dp"
+            android:layout_weight="5"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/gallery_select" />
 
-    <ImageView
-        android:id="@+id/giftPhoto3"
-        android:layout_width="146dp"
-        android:layout_height="138dp"
-        android:layout_marginStart="12dp"
-        android:layout_marginTop="28dp"
-        app:layout_constraintStart_toEndOf="@+id/giftPhotoButtonGallery"
-        app:layout_constraintTop_toBottomOf="@+id/giftPhoto2"
-        app:srcCompat="@android:drawable/screen_background_light_transparent" />
+        <ImageView
+            android:id="@+id/giftPhoto2"
+            android:layout_width="0dp"
+            android:layout_weight="5"
+            android:layout_height="match_parent"
+            android:layout_marginRight="8dp"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintStart_toEndOf="@+id/giftPhoto1"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/gallery_select" />
 
-    <EditText
-        android:id="@+id/giftIdeaNotes"
-        android:layout_width="348dp"
-        android:layout_height="92dp"
-        android:layout_marginTop="340dp"
-        android:ems="10"
-        android:hint="@string/giftIdeaNotes"
-        android:inputType="textMultiLine"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/giftIdeaName" />
+    </LinearLayout>
 
-    <TextView
-        android:id="@+id/giftIdeaName"
-        android:layout_width="319dp"
-        android:layout_height="45dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginLeft="48dp"
-        android:layout_marginTop="16dp"
-        android:text="@string/giftIdeaName"
-        android:textSize="24sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="136dp"
+        android:weightSum="10"
+        android:layout_marginTop="150dp">
+        <EditText
+            android:id="@+id/giftIdeaNotes"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="5"
+            android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"
+            android:ems="10"
+            android:hint="@string/giftIdeaNotes"
+            android:inputType="textMultiLine"
+            app:layout_constraintBottom_toBottomOf="@id/imageLinear"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="@id/giftPhoto3"
+            app:layout_constraintTop_toBottomOf="@+id/imageLinear" />
+        <ImageView
+            android:id="@+id/giftPhoto3"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="5"
+            android:layout_marginRight="8dp"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/giftIdeaNotes"
+            app:layout_constraintTop_toBottomOf="@+id/imageLinear"
+            app:srcCompat="@drawable/gallery_select" />
 
-</android.support.constraint.ConstraintLayout>
+    </LinearLayout>
+
+
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:weightSum="2"
+        android:orientation="horizontal"
+        android:id="@+id/linearLayout2">
+
+        <android.support.v7.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/saveGift"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginStart="8dp"
+            app:cardBackgroundColor="#6b4354"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="15dp"
+            android:layout_weight="1">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Save Gift"
+                android:textSize="20sp"
+                android:textColor="#A9A9A9"
+                android:layout_centerInParent="true"/>
+        </RelativeLayout>
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/giveGift"
+            android:layout_weight="1"
+            android:layout_marginRight="8dp"
+            android:layout_marginEnd="8dp"
+            app:cardBackgroundColor="#6b4354"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="15dp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Give This Gift"
+                android:textSize="20sp"
+                android:textColor="#A9A9A9"
+                android:layout_centerInParent="true"/>
+        </RelativeLayout>
+        </android.support.v7.widget.CardView>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_above="@+id/linearLayout2"
+        android:layout_marginBottom="50dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:weightSum="4">
+
+        <TextView
+            android:id="@+id/url"
+            android:layout_width="0dp"
+            android:layout_weight="3"
+            android:layout_height="30dp"
+            android:textSize="20sp"
+            android:drawableLeft="@drawable/ic_edit_crayon"
+            android:text="URL" />
+
+
+        <android.support.v7.widget.CardView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:id="@+id/visitURL"
+            android:layout_marginRight="8dp"
+            android:layout_marginEnd="8dp"
+            app:cardBackgroundColor="#6b4354"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="15dp">
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Visit URL"
+                    android:textSize="20sp"
+                    android:textColor="#A9A9A9"
+                    android:layout_centerInParent="true"/>
+
+            </RelativeLayout>
+
+        </android.support.v7.widget.CardView>
+
+
+    </LinearLayout>
+
+
+
+</RelativeLayout>
+
