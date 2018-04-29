@@ -51,6 +51,11 @@ public class Gift
 	}
 
 	@Exclude
+	public static DatabaseReference GetGiftedListReference() {
+		return FirebaseDatabase.getInstance().getReference("GiftedList");
+	}
+
+	@Exclude
 	public static void GetAndSetToRunOnce(String friendIdKey, ValueEventListener eventListener) {
 		DatabaseReference ref = GetGiftListsReference().child(friendIdKey);
 		ref.addListenerForSingleValueEvent(eventListener);
@@ -89,7 +94,7 @@ public class Gift
 			@Override
 			public void onDataChange(DataSnapshot dataSnapshot) {
 				String imageID = dataSnapshot.child("imageID").toString();
-				// delete from image collection
+				// ToDo delete from image collection
 				giftRef.removeValue();
 			}
 
@@ -118,8 +123,15 @@ public class Gift
 	public void updateGift(String giftID) {
 		DatabaseReference giftsRef = GetGiftsReference().child(giftID);
 		giftsRef.setValue(this);
+	}
 
+	@Exclude
+	public void moveToGifted (String giftID, String eventID, String friendID) {
 
+		DatabaseReference giftsRef = GetGiftedListReference().child(Database.GetCurrentUID()).child(friendID).child(giftID);
+		DatabaseReference giftListReference = GetGiftListsReference().child(eventID);
+		giftsRef.setValue(this);
+		giftListReference.child(giftID).removeValue();
 	}
 
 }

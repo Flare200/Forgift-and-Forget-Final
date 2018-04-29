@@ -9,12 +9,15 @@ import android.database.DataSetObserver;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -37,6 +40,7 @@ public class IdeaPage extends AppCompatActivity
 	String friendID;
 	String eventID;
 	String eventName;
+	String eventListID;
 
 	ListView ideaListView;
 
@@ -49,6 +53,7 @@ public class IdeaPage extends AppCompatActivity
 		friendID = getIntent().getStringExtra("friendID");
 		eventID = getIntent().getStringExtra("eventID");
 		eventName = getIntent().getStringExtra("eventName");
+		eventListID = getIntent().getStringExtra("eventListID");
 		giftListReference = Gift.GetGiftListsReference().child(eventID);
 		ideaListView = (ListView) findViewById(R.id.ideaList);
 		setTitle(eventName);
@@ -58,7 +63,16 @@ public class IdeaPage extends AppCompatActivity
 				Intent giftIntent = new Intent(IdeaPage.this, GiftIdeas.class);
 				giftIntent.putExtra("giftID", giftIDS.get(position));
 				giftIntent.putExtra("friendID", friendID);
+				giftIntent.putExtra("eventID", eventID);
+				giftIntent.putExtra("eventListID", eventListID);
 				startActivity(giftIntent);
+			}
+		});
+		ideaListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+			@Override
+			public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
+				editGiftName(position);
+				return true;
 			}
 		});
 
@@ -154,6 +168,7 @@ public class IdeaPage extends AppCompatActivity
 		intentIdeaCreation.putExtra("friendID",friendID);
 		intentIdeaCreation.putExtra("eventID",eventID);
 		intentIdeaCreation.putExtra("eventName",eventName);
+		intentIdeaCreation.putExtra("eventListID",eventListID);
 		finish();
 		startActivity(intentIdeaCreation);
 	}
@@ -176,6 +191,41 @@ public class IdeaPage extends AppCompatActivity
 			startActivity(intent);
 		}
 		return super.onKeyDown(keyCode, event);
+	}
+
+	public void editGiftName(final int position){
+		AlertDialog.Builder giftEditDialog = new AlertDialog.Builder(IdeaPage.this);
+		LayoutInflater inflater = LayoutInflater.from(IdeaPage.this);
+		final View dialogView = inflater.inflate(R.layout.dialog_single_edit_text, null);
+		final EditText giftName = (EditText) dialogView.findViewById(R.id.editText);
+		giftName.setText(gifts.get(position).name);
+		giftEditDialog.setPositiveButton("Update", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				String name = giftName.getText().toString().trim();
+				if(name.length() == 0){
+					Toast.makeText(getApplicationContext(), "Please Enter a name first", Toast.LENGTH_LONG).show();
+					editGiftName(position);
+					return;
+				}
+				Gift thisGift = gifts.get(position);
+				thisGift.name = name;
+				thisGift.updateGift(giftIDS.get(position));
+				reloadPage();
+			}
+		}).setNegativeButton("Cancel", null).setTitle("Update Gift Name");
+		giftEditDialog.setView(dialogView);
+		giftEditDialog.show();
+	}
+
+	public void reloadPage(){
+		Intent ideaIntent = new Intent(IdeaPage.this, IdeaPage.class);
+		ideaIntent.putExtra("eventID", eventID);
+		ideaIntent.putExtra("eventName",eventName);
+		ideaIntent.putExtra("friendID", friendID);
+		ideaIntent.putExtra("eventListID", eventListID);
+		finish();
+		startActivity(ideaIntent);
 	}
 
 }

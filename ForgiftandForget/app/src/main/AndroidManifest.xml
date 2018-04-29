@@ -34,9 +34,11 @@
         <activity android:name=".GiftedList" />
         <activity android:name=".FriendCreation" />
         <activity android:name=".GiftIdeas" />
-        <activity android:name=".EventCreation"/>
-        <activity android:name=".IdeaCreation"/>
-        <activity android:name=".PasswordReset"></activity>
+        <activity android:name=".EventCreation" />
+        <activity android:name=".IdeaCreation" />
+        <activity android:name=".PasswordReset" />
+        <activity android:name=".GiftedIdeaPage" />
+        <activity android:name=".GiftedIdeas"></activity>
     </application>
 
 </manifest>
