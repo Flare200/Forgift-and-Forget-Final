@@ -21,6 +21,8 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="46dp"
         android:ems="10"
+        android:textColor="#ffffff"
+        android:textColorHint="#d8d8d8"
         android:hint="@string/name" />
 
     <ProgressBar

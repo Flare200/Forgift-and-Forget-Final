@@ -13,6 +13,7 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.Uri;
 import android.provider.CalendarContract;
 import android.provider.MediaStore;
@@ -903,6 +904,8 @@ public class FriendList extends AppCompatActivity implements AdapterView.OnItemS
 				if (position == getCount()) {
 					((TextView)v.findViewById(android.R.id.text1)).setText("");
 					((TextView)v.findViewById(android.R.id.text1)).setHint(getItem(getCount())); // Hint to be displayed
+					((TextView)v.findViewById(android.R.id.text1)).setHintTextColor(Color.parseColor("#D8D8D8"));
+					((TextView)v.findViewById(android.R.id.text1)).setTextColor(Color.parseColor("#FFFFFF"));
 				}
 				return v;
 			}

@@ -9,7 +9,7 @@
         tools:style="@style/CardView"
         android:layout_width="140dp"
         android:layout_height="35dp"
-        app:cardBackgroundColor="#6b4354"
+        app:cardBackgroundColor="@color/colorButton"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
         app:cardCornerRadius="15dp"
@@ -22,7 +22,7 @@
             android:layout_height="match_parent"
             android:layout_marginLeft="10dp"
             android:layout_marginStart="10dp"
-            android:textColor="#A9A9A9"
+            android:textColor="@color/colorButtonAccent"
             android:gravity="center_vertical"
             android:textAlignment="center"
             android:textSize="15sp" />
