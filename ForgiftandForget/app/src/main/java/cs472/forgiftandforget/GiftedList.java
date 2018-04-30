@@ -1,8 +1,12 @@
 package cs472.forgiftandforget;
 
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -24,7 +28,6 @@ public class GiftedList extends AppCompatActivity {
 
 	String friendID;
 	ListView giftedListView;
-	CopyOnWriteArrayList<Gift> gifts = new CopyOnWriteArrayList<>();
 	CopyOnWriteArrayList<String> giftIDS = new CopyOnWriteArrayList<>();
 	DatabaseReference giftedListReference;
 	DatabaseReference friendReference;
@@ -38,7 +41,6 @@ public class GiftedList extends AppCompatActivity {
 		final ArrayList<String> headerList = new ArrayList<String>();
 
 		giftedListView = (ListView) findViewById(R.id.giftedList);
-		//setTitle(eventName);
 		giftedListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -51,7 +53,20 @@ public class GiftedList extends AppCompatActivity {
 		giftedListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
 			@Override
 			public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
-				// ToDo ask to delete from gifted list dialog
+				AlertDialog.Builder deleteDialog = new AlertDialog.Builder(GiftedList.this);
+				deleteDialog.setMessage("Permanently remove " +  headerList.get(position).trim() + " from Gifted List");
+				deleteDialog.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						DatabaseReference giftReference = Gift.GetGiftedListReference()
+								.child(Database.GetCurrentUID()).child(friendID)
+								.child(giftIDS.get(position));
+						giftReference.removeValue();
+						reloadPage();
+					}
+				}).setNegativeButton("Cancel", null);
+				deleteDialog.create();
+				deleteDialog.show();
 				return true;
 			}
 		});
@@ -96,5 +111,21 @@ public class GiftedList extends AppCompatActivity {
 			}
 		});
 
+	}
+
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if (keyCode == KeyEvent.KEYCODE_BACK) {
+			Intent intent = new Intent(GiftedList.this, FriendList.class);
+			finish();
+			startActivity(intent);
+		}
+		return super.onKeyDown(keyCode, event);
+	}
+
+	public void reloadPage(){
+		Intent giftedIntent = new Intent(this, GiftedList.class);
+		giftedIntent.putExtra("friendID", friendID);
+		startActivity(giftedIntent);
 	}
 }

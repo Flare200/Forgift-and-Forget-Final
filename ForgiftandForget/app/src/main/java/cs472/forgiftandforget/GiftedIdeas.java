@@ -1,5 +1,6 @@
 package cs472.forgiftandforget;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.support.annotation.NonNull;
@@ -7,10 +8,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.InputType;
 import android.text.util.Linkify;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -33,8 +36,8 @@ public class GiftedIdeas extends AppCompatActivity {
 	String friendID;
 	Gift thisGift;
 	DatabaseReference giftedReference;
-	EditText notesField;
-	EditText urlField;
+	TextView notesField;
+	TextView urlField;
 
 	Uri images[];
 	ImageView photo[] = new ImageView[3];
@@ -47,10 +50,8 @@ public class GiftedIdeas extends AppCompatActivity {
 		//remove most functionality
 		LinearLayout invisibleButtons = (LinearLayout) findViewById(R.id.linear4);
 		invisibleButtons.setVisibility(View.GONE);
-		notesField = (EditText) findViewById(R.id.giftIdeaNotes);
-		notesField.setInputType(InputType.TYPE_NULL);
-		urlField = (EditText) findViewById(R.id.url);
-		urlField.setInputType(InputType.TYPE_NULL);
+		notesField = (TextView) findViewById(R.id.giftIdeaNotes);
+		urlField = (TextView) findViewById(R.id.url);
 
 		photo[0] = (ImageView) findViewById(R.id.giftPhoto1);
 		photo[1] = (ImageView) findViewById(R.id.giftPhoto2);
@@ -116,5 +117,16 @@ public class GiftedIdeas extends AppCompatActivity {
 		setTitle(thisGift.name);
 		notesField.setText(thisGift.description);
 		urlField.setText(thisGift.url);
+	}
+
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if (keyCode == KeyEvent.KEYCODE_BACK) {
+			Intent intent = new Intent(GiftedIdeas.this, GiftedList.class);
+			intent.putExtra("friendID", friendID);
+			finish();
+			startActivity(intent);
+		}
+		return super.onKeyDown(keyCode, event);
 	}
 }

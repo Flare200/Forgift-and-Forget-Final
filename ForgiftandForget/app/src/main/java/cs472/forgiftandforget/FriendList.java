@@ -107,6 +107,7 @@ public class FriendList extends AppCompatActivity implements AdapterView.OnItemS
 	DatabaseReference friendsListReference;
 
 
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
     {
@@ -148,7 +149,6 @@ public class FriendList extends AppCompatActivity implements AdapterView.OnItemS
 						}
 						case ExpandableListView.PACKED_POSITION_TYPE_CHILD: {
 							// if event item clicked
-							// ToDo have an edit event option maybe? will need to verify they didnt click ~add event~
 							if(eventPosition < friendsEvents.get(friendPosition).size()){
 								editEvent(friendPosition, eventPosition);
 							}
@@ -479,7 +479,7 @@ public class FriendList extends AppCompatActivity implements AdapterView.OnItemS
 				// all required fields are set, add the event
 				Event newEvent = new Event(eventName.getText().toString().trim(), eventDate.getText().toString().trim(), eventTime.getText().toString().trim());
 				Event.AddEvent(currentFriend.eventListID, currentFriend.friendID, newEvent);
-				checkPermissions();
+				checkPermissions(currentFriend, newEvent);
 			}
 		});
 
@@ -613,7 +613,7 @@ public class FriendList extends AppCompatActivity implements AdapterView.OnItemS
 		}
 	};
 
-	public void checkPermissions(){
+	public void checkPermissions(Friend currentFriend, Event newEvent){
 		boolean write = true;
 		boolean read = true;
 
@@ -632,11 +632,11 @@ public class FriendList extends AppCompatActivity implements AdapterView.OnItemS
 					MY_PERMISSIONS_REQUEST_READ_WRITE_CALENDAR);
 		}else{
 			//permission was already granted
-			addCalendarEntry();
+			addCalendarEntry(currentFriend, newEvent);
 		}
 	}
 
-	public void addCalendarEntry(){
+	public void addCalendarEntry(Friend currentFriend, Event newEvent){
 		Calendar startTime = Calendar.getInstance();
 		startTime.set(year, month - 1, day, hour, minute);
 		Calendar endTime = Calendar.getInstance();
@@ -695,7 +695,9 @@ public class FriendList extends AppCompatActivity implements AdapterView.OnItemS
 		}
 		// new event added
 		Toast.makeText(getApplicationContext(), "Added " + eventName.getText().toString() + " to events and Calendar", Toast.LENGTH_LONG).show();
-		reloadFriendsList();
+		//reloadFriendsList();
+		// isntead of reloading friends list, send to gift list immediately
+		openIdeaPage(newEvent.eventID, newEvent.getName(), currentFriend);
 	}
 
 	public void reloadFriendsList(){
@@ -822,7 +824,7 @@ public class FriendList extends AppCompatActivity implements AdapterView.OnItemS
 				thisEvent.setDate(eventDate.getText().toString().trim());
 				thisEvent.setTime(eventTime.getText().toString().trim());
 				Event.UpdateEvent(friends.get(friendPosition).eventListID, thisEvent);
-				checkPermissions();
+				checkPermissions(friends.get(friendPosition), thisEvent);
 			}
 		});
 		editEventAlert.setNeutralButton("Delete", new DialogInterface.OnClickListener() {
@@ -930,5 +932,4 @@ public class FriendList extends AppCompatActivity implements AdapterView.OnItemS
 		// finish();
 		startActivity(giftedIntent);
 	}
-
 }
