@@ -6,5 +6,6 @@
     android:layout_margin="20dp"
     android:textSize="30dp"
     android:textStyle="bold"
+    android:textColor="#ffffff"
     android:orientation="vertical">
 </TextView>
