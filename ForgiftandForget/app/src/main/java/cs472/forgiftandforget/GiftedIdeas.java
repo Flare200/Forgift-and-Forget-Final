@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -33,7 +34,7 @@ public class GiftedIdeas extends AppCompatActivity {
 	String friendID;
 	Gift thisGift;
 	DatabaseReference giftedReference;
-	EditText notesField;
+	TextView notesField;
 	EditText urlField;
 
 	Uri images[];
@@ -47,8 +48,7 @@ public class GiftedIdeas extends AppCompatActivity {
 		//remove most functionality
 		LinearLayout invisibleButtons = (LinearLayout) findViewById(R.id.linear4);
 		invisibleButtons.setVisibility(View.GONE);
-		notesField = (EditText) findViewById(R.id.giftIdeaNotes);
-		notesField.setInputType(InputType.TYPE_NULL);
+		notesField = (TextView) findViewById(R.id.giftIdeaNotes);
 		urlField = (EditText) findViewById(R.id.url);
 		urlField.setInputType(InputType.TYPE_NULL);
 
