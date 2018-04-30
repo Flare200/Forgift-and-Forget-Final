@@ -113,7 +113,7 @@ public class Gift
 		if(images[1] != null){
 			storageReference.child(imageID2).putFile(images[1]);
 		}
-		if(images[1] != null){
+		if(images[2] != null){
 			storageReference.child(imageID3).putFile(images[2]);
 		}
 	}
