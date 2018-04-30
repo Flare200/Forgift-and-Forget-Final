@@ -289,7 +289,8 @@ public class FriendList extends AppCompatActivity implements AdapterView.OnItemS
 						if (childPosition == myAdapter.getChildrenCount(groupPosition) - 2) {
 							addEvent(friends.get(groupPosition));
 						}else if(childPosition == myAdapter.getChildrenCount(groupPosition) - 1) {
-							// ToDo send to gifted page (pass friend ID through)
+							// send to gifted list
+							openGiftedList(friends.get(groupPosition).friendID);
 						}else{
 							// send eventID to IdeaPage
 							openIdeaPage(friendsEvents.get(groupPosition).get(childPosition).eventID,friendsEvents.get(groupPosition).get(childPosition).name,friends.get(groupPosition));
@@ -506,6 +507,7 @@ public class FriendList extends AppCompatActivity implements AdapterView.OnItemS
 		ideaIntent.putExtra("eventID", eventID);
 		ideaIntent.putExtra("eventName",eventName);
 		ideaIntent.putExtra("friendID", currentFriend.friendID);
+		ideaIntent.putExtra("eventListID", currentFriend.eventListID);
 		finish();
 		startActivity(ideaIntent);
 	}
@@ -918,6 +920,15 @@ public class FriendList extends AppCompatActivity implements AdapterView.OnItemS
 		reminder.setAdapter(adapter);
 		reminder.setSelection(adapter.getCount());
 		reminder.setOnItemSelectedListener(FriendList.this);
+	}
+
+	public void openGiftedList(String friendID){
+		Intent giftedIntent = new Intent(ctx, GiftedList.class);
+		giftedIntent.putExtra("friendID", friendID);
+
+		// going to allow backing from gifted all the way back to friends list
+		// finish();
+		startActivity(giftedIntent);
 	}
 
 }
