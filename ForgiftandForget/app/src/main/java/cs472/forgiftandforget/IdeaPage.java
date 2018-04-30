@@ -92,6 +92,10 @@ public class IdeaPage extends AppCompatActivity
 					String giftID = Child.getKey();
 					giftIDS.add(giftID);
 				}
+				if(giftIDS.size() == 0){
+					// no gifts, open dialog to add a gift
+					addNewGift();
+				}
 
 				for (int i = 0; i < giftIDS.size(); i++)
 				{
@@ -163,14 +167,26 @@ public class IdeaPage extends AppCompatActivity
 
 	private void addNewGift()
 	{
-		// ToDo make into dialog
-		Intent intentIdeaCreation = new Intent(IdeaPage.this, IdeaCreation.class);
-		intentIdeaCreation.putExtra("friendID",friendID);
-		intentIdeaCreation.putExtra("eventID",eventID);
-		intentIdeaCreation.putExtra("eventName",eventName);
-		intentIdeaCreation.putExtra("eventListID",eventListID);
-		finish();
-		startActivity(intentIdeaCreation);
+		AlertDialog.Builder addGiftAlert = new AlertDialog.Builder(this);
+		LayoutInflater inflater = LayoutInflater.from(this);
+		final View dialogView = inflater.inflate(R.layout.dialog_single_edit_text, null);
+		addGiftAlert.setTitle("Add New Gift");
+		final EditText giftName = (EditText) dialogView.findViewById(R.id.editText);
+		giftName.setHint("Gift Name");
+		addGiftAlert.setPositiveButton("Add", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				String newGiftName = giftName.getText().toString().trim();
+				if(newGiftName.length() > 0) {
+					Gift newGift = new Gift(newGiftName);
+					Gift.AddGift(eventID,newGift);
+					reloadPage();
+				}
+
+			}
+		}).setNegativeButton("Cancel", null);
+		addGiftAlert.setView(dialogView);
+		addGiftAlert.show();
 	}
 
 	private void userLogOut()

@@ -93,8 +93,7 @@ public class Gift
 		giftRef.addListenerForSingleValueEvent(new ValueEventListener() {
 			@Override
 			public void onDataChange(DataSnapshot dataSnapshot) {
-				String imageID = dataSnapshot.child("imageID").toString();
-				// ToDo delete from image collection
+				// ToDo delete images from collection
 				giftRef.removeValue();
 			}
 

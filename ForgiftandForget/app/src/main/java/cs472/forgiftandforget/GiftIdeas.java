@@ -56,10 +56,6 @@ public class GiftIdeas extends AppCompatActivity implements View.OnClickListener
 	EditText notesField;
 	CardView saveGift;
 	CardView giveGift;
-	CardView visitURL;
-	LinearLayout linear1;
-	LinearLayout linear2;
-	LinearLayout linear3;
 	Uri images[];
 	String friendID;  // will need this later for sending to gifted list
 	String giftID;
@@ -96,13 +92,13 @@ public class GiftIdeas extends AppCompatActivity implements View.OnClickListener
 		urlField.setOnFocusChangeListener(new View.OnFocusChangeListener() {
 			@Override
 			public void onFocusChange(View v, boolean hasFocus) {
+				// if url field loses focus, add a single space, so it remains editable
+				// while still allowing the link to be clicked
 				if(!hasFocus){
 					spannable = new SpannableString(urlField.getText().toString().trim());
 					CharSequence text = TextUtils.concat(spannable, " ");
 					urlField.setText(text);
 					Linkify.addLinks(urlField, Linkify.WEB_URLS);
-				}else{
-
 				}
 			}
 		});
@@ -228,7 +224,6 @@ public class GiftIdeas extends AppCompatActivity implements View.OnClickListener
 			case R.id.giveGift:
 				// send to gifted list
 				verificationDialog();
-				// ToDO send to gifted list
 				break;
 		}
 	}
@@ -283,6 +278,7 @@ public class GiftIdeas extends AppCompatActivity implements View.OnClickListener
 		Intent giftIntent = new Intent(GiftIdeas.this, GiftedList.class);
 		giftIntent.putExtra("giftID", giftID);
 		giftIntent.putExtra("friendID", friendID);
+		finish();
 		startActivity(giftIntent);
 	}
 
