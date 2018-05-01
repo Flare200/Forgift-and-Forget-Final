@@ -15,6 +15,7 @@ public class IdeaCreation extends AppCompatActivity
     String friendID;
     String eventID;
     String eventName;
+    String eventListID;
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -25,6 +26,7 @@ public class IdeaCreation extends AppCompatActivity
         friendID = getIntent().getStringExtra("friendID");
         eventID = getIntent().getStringExtra("eventID");
         eventName = getIntent().getStringExtra("eventName");
+        eventListID = getIntent().getStringExtra("eventListID");
     }
 
     public void addIdea(View view)
@@ -71,6 +73,7 @@ public class IdeaCreation extends AppCompatActivity
         ideaPageIntent.putExtra("friendID",friendID);
         ideaPageIntent.putExtra("eventID",eventID);
         ideaPageIntent.putExtra("eventName",eventName);
+        ideaPageIntent.putExtra("eventListID",eventListID);
 
         finish();
         startActivity(ideaPageIntent);

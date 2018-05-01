@@ -9,6 +9,7 @@ import android.database.DataSetObserver;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,6 +17,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import android.view.LayoutInflater;
 import android.widget.Toast;
@@ -43,6 +45,8 @@ public class IdeaPage extends AppCompatActivity
 	String eventName;
 	EditText ideaName;
 	String goToNewGift;
+	String eventListID;
+
 
 	ListView ideaListView;
 
@@ -56,6 +60,7 @@ public class IdeaPage extends AppCompatActivity
 		eventID = getIntent().getStringExtra("eventID");
 		eventName = getIntent().getStringExtra("eventName");
 		goToNewGift = getIntent().getStringExtra("intentFrom");
+		eventListID = getIntent().getStringExtra("eventListID");
 		giftListReference = Gift.GetGiftListsReference().child(eventID);
 		ideaListView = (ListView) findViewById(R.id.ideaList);
 		setTitle(eventName);
@@ -65,12 +70,20 @@ public class IdeaPage extends AppCompatActivity
 				Intent giftIntent = new Intent(IdeaPage.this, GiftIdeas.class);
 				giftIntent.putExtra("giftID", giftIDS.get(position));
 				giftIntent.putExtra("friendID", friendID);
+				giftIntent.putExtra("eventID", eventID);
+				giftIntent.putExtra("eventListID", eventListID);
 				startActivity(giftIntent);
+			}
+		});
+		ideaListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+			@Override
+			public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
+				editGiftName(position);
+				return true;
 			}
 		});
 
 		final ArrayList<String> headerList = new ArrayList<String>();
-
 
 		giftListReference.addListenerForSingleValueEvent(new ValueEventListener()
 		{
@@ -84,6 +97,10 @@ public class IdeaPage extends AppCompatActivity
 				{
 					String giftID = Child.getKey();
 					giftIDS.add(giftID);
+				}
+				if(giftIDS.size() == 0){
+					// no gifts, open dialog to add a gift
+					addNewGift();
 				}
 
 				//Takes you to the idea page if a new idea was just added to the list
@@ -166,7 +183,8 @@ public class IdeaPage extends AppCompatActivity
 
 	private void addNewGift()
 	{
-		// create a new dialog, set the layout
+
+/*	// create a new dialog, set the layout
 		AlertDialog.Builder addIdeaDialog = new AlertDialog.Builder(this);
 		LayoutInflater inflater = LayoutInflater.from(this);
 		final View dialogView = inflater.inflate(R.layout.add_idea_dialogue, null);
@@ -206,7 +224,28 @@ public class IdeaPage extends AppCompatActivity
 		});
 		addIdeaDialog.setNegativeButton("Cancel", null);
 		addIdeaDialog.setView(dialogView);
-		addIdeaDialog.show();
+		addIdeaDialog.show(); */
+
+		AlertDialog.Builder addGiftAlert = new AlertDialog.Builder(this);
+		LayoutInflater inflater = LayoutInflater.from(this);
+		final View dialogView = inflater.inflate(R.layout.dialog_single_edit_text, null);
+		addGiftAlert.setTitle("Add New Gift");
+		final EditText giftName = (EditText) dialogView.findViewById(R.id.editText);
+		giftName.setHint("Gift Name");
+		addGiftAlert.setPositiveButton("Add", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				String newGiftName = giftName.getText().toString().trim();
+				if(newGiftName.length() > 0) {
+					Gift newGift = new Gift(newGiftName);
+					Gift.AddGift(eventID,newGift);
+					reloadPage();
+				}
+
+			}
+		}).setNegativeButton("Cancel", null);
+		addGiftAlert.setView(dialogView);
+		addGiftAlert.show();
 	}
 
 	private void userLogOut()
@@ -227,6 +266,41 @@ public class IdeaPage extends AppCompatActivity
 			startActivity(intent);
 		}
 		return super.onKeyDown(keyCode, event);
+	}
+
+	public void editGiftName(final int position){
+		AlertDialog.Builder giftEditDialog = new AlertDialog.Builder(IdeaPage.this);
+		LayoutInflater inflater = LayoutInflater.from(IdeaPage.this);
+		final View dialogView = inflater.inflate(R.layout.dialog_single_edit_text, null);
+		final EditText giftName = (EditText) dialogView.findViewById(R.id.editText);
+		giftName.setText(gifts.get(position).name);
+		giftEditDialog.setPositiveButton("Update", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				String name = giftName.getText().toString().trim();
+				if(name.length() == 0){
+					Toast.makeText(getApplicationContext(), "Please Enter a name first", Toast.LENGTH_LONG).show();
+					editGiftName(position);
+					return;
+				}
+				Gift thisGift = gifts.get(position);
+				thisGift.name = name;
+				thisGift.updateGift(giftIDS.get(position));
+				reloadPage();
+			}
+		}).setNegativeButton("Cancel", null).setTitle("Update Gift Name");
+		giftEditDialog.setView(dialogView);
+		giftEditDialog.show();
+	}
+
+	public void reloadPage(){
+		Intent ideaIntent = new Intent(IdeaPage.this, IdeaPage.class);
+		ideaIntent.putExtra("eventID", eventID);
+		ideaIntent.putExtra("eventName",eventName);
+		ideaIntent.putExtra("friendID", friendID);
+		ideaIntent.putExtra("eventListID", eventListID);
+		finish();
+		startActivity(ideaIntent);
 	}
 
 }
