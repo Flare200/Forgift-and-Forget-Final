@@ -19,6 +19,9 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import android.view.LayoutInflater;
+import android.widget.Toast;
+
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -40,7 +43,10 @@ public class IdeaPage extends AppCompatActivity
 	String friendID;
 	String eventID;
 	String eventName;
+	EditText ideaName;
+	String goToNewGift;
 	String eventListID;
+
 
 	ListView ideaListView;
 
@@ -53,6 +59,7 @@ public class IdeaPage extends AppCompatActivity
 		friendID = getIntent().getStringExtra("friendID");
 		eventID = getIntent().getStringExtra("eventID");
 		eventName = getIntent().getStringExtra("eventName");
+		goToNewGift = getIntent().getStringExtra("intentFrom");
 		eventListID = getIntent().getStringExtra("eventListID");
 		giftListReference = Gift.GetGiftListsReference().child(eventID);
 		ideaListView = (ListView) findViewById(R.id.ideaList);
@@ -78,7 +85,6 @@ public class IdeaPage extends AppCompatActivity
 
 		final ArrayList<String> headerList = new ArrayList<String>();
 
-
 		giftListReference.addListenerForSingleValueEvent(new ValueEventListener()
 		{
 			@Override
@@ -95,6 +101,16 @@ public class IdeaPage extends AppCompatActivity
 				if(giftIDS.size() == 0){
 					// no gifts, open dialog to add a gift
 					addNewGift();
+				}
+
+				//Takes you to the idea page if a new idea was just added to the list
+				if(goToNewGift.equals("Idea"))
+				{
+					Intent giftIntent = new Intent(IdeaPage.this, GiftIdeas.class);
+					int test = giftIDS.size() - 1;
+					giftIntent.putExtra("giftID", giftIDS.get(test));
+					giftIntent.putExtra("friendID", friendID);
+					startActivity(giftIntent);
 				}
 
 				for (int i = 0; i < giftIDS.size(); i++)
@@ -167,6 +183,49 @@ public class IdeaPage extends AppCompatActivity
 
 	private void addNewGift()
 	{
+
+/*	// create a new dialog, set the layout
+		AlertDialog.Builder addIdeaDialog = new AlertDialog.Builder(this);
+		LayoutInflater inflater = LayoutInflater.from(this);
+		final View dialogView = inflater.inflate(R.layout.add_idea_dialogue, null);
+
+		// get reference to the dialogue edit text
+		ideaName = (EditText) dialogView.findViewById(R.id.dialogEditText);
+
+		//Adds idea to database
+		addIdeaDialog.setTitle("Add Idea");
+		addIdeaDialog.setPositiveButton("Add", new DialogInterface.OnClickListener()
+		{
+			@Override
+			public void onClick(DialogInterface dialog, int which)
+			{
+				// check length of name, if 0 toast and re-dialogue
+				final String newIdea = ideaName.getText().toString();
+				if(newIdea.length() == 0)
+				{
+					Toast.makeText(getApplicationContext(), "Please add an idea first", Toast.LENGTH_LONG).show();
+					addNewGift();
+				}
+				else
+				{
+					Gift newGift = new Gift(newIdea);
+					Gift.AddGift(eventID,newGift);
+
+					//UI stuff
+					Intent reloadIntent = new Intent(IdeaPage.this, IdeaPage.class);
+					reloadIntent.putExtra("friendID",friendID);
+					reloadIntent.putExtra("eventID",eventID);
+					reloadIntent.putExtra("eventName",eventName);
+					reloadIntent.putExtra("intentFrom","Idea");
+					finish();
+					startActivity(reloadIntent);
+				}
+			}
+		});
+		addIdeaDialog.setNegativeButton("Cancel", null);
+		addIdeaDialog.setView(dialogView);
+		addIdeaDialog.show(); */
+
 		AlertDialog.Builder addGiftAlert = new AlertDialog.Builder(this);
 		LayoutInflater inflater = LayoutInflater.from(this);
 		final View dialogView = inflater.inflate(R.layout.dialog_single_edit_text, null);
