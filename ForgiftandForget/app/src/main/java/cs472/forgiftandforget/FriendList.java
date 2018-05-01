@@ -508,11 +508,7 @@ public class FriendList extends AppCompatActivity implements AdapterView.OnItemS
 		ideaIntent.putExtra("eventID", eventID);
 		ideaIntent.putExtra("eventName",eventName);
 		ideaIntent.putExtra("friendID", currentFriend.friendID);
-
-    //This is used to for adding new gift ideas to the idea page
-		ideaIntent.putExtra("intentFrom","Friend");
 		ideaIntent.putExtra("eventListID", currentFriend.eventListID);
-
 		finish();
 		startActivity(ideaIntent);
 	}
